@@ -22,6 +22,7 @@ import {
   Search,
   HelpCircle,
   CheckCircle,
+  UserPlus,
 } from 'lucide-react';
 import { useNewUserRole, newRolePermissions, UserRole } from '@/hooks/useNewRole';
 import {
@@ -61,6 +62,7 @@ const desenvolvimentoNavItems = [
 
 // Operações & Eventos
 const operacoesNavItems = [
+  { title: 'Recepção', url: '/recepcao', icon: UserPlus, page: 'recepcao', roles: ['pastor', 'lider'] },
   { title: 'Agenda', url: '/dashboard/agenda', icon: Calendar, page: 'agenda' }, // Visível para todos
   { title: 'Eventos', url: '/dashboard/eventos', icon: Ticket, page: 'eventos' }, // Visível para todos
   { title: 'Patrimônio', url: '/dashboard/patrimonio', icon: Briefcase, page: 'patrimonio', roles: ['pastor'] },
