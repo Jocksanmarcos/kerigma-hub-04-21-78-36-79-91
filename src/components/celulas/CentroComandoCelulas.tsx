@@ -6,6 +6,7 @@ import { DashboardLiderCelulaEnhanced } from './DashboardLiderCelulaEnhanced';
 import { DashboardSupervisor } from './DashboardSupervisor';
 import { BibliotecaRecursos } from './BibliotecaRecursos';
 import { GestaoVisitantesEnhanced } from './GestaoVisitantesEnhanced';
+import { GerenciarLideresDialog } from './GerenciarLideresDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -163,6 +164,11 @@ export const CentroComandoCelulas: React.FC = () => {
             <p className="text-xs text-muted-foreground">Requerem atenção</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Ações Administrativas */}
+      <div className="flex justify-end">
+        <GerenciarLideresDialog />
       </div>
 
       {/* Main Interface */}
