@@ -37,7 +37,8 @@ import {
   UserCheck,
   Activity,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Settings
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -411,10 +412,13 @@ const ListaMembro: React.FC<ListaMembroProps> = ({ pessoas, onAction }) => {
   );
 };
 
+import BirthdayNotificationSettings from '@/components/notifications/BirthdayNotificationSettings';
+
 // Componente para exibir aniversariantes
 const AniversariosContent: React.FC = () => {
   const [aniversariantes, setAniversariantes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeSubTab, setActiveSubTab] = useState<'lista' | 'configuracoes'>('lista');
 
   useEffect(() => {
     const loadAniversariantes = async () => {
@@ -453,47 +457,78 @@ const AniversariosContent: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
-      {aniversariantes.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          Nenhum aniversariante neste mês
+    <div className="space-y-6">
+      {/* Sub-navegação */}
+      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        <Button
+          variant={activeSubTab === 'lista' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveSubTab('lista')}
+          className="flex items-center gap-2"
+        >
+          <Users className="h-4 w-4" />
+          Lista de Aniversariantes
+        </Button>
+        <Button
+          variant={activeSubTab === 'configuracoes' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveSubTab('configuracoes')}
+          className="flex items-center gap-2"
+        >
+          <Settings className="h-4 w-4" />
+          Configurar Notificações
+        </Button>
+      </div>
+
+      {/* Conteúdo das sub-abas */}
+      {activeSubTab === 'lista' && (
+        <div className="space-y-4">
+          {aniversariantes.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum aniversariante neste mês
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {aniversariantes.map((pessoa) => {
+                const dataNasc = new Date(pessoa.data_nascimento);
+                const idade = new Date().getFullYear() - dataNasc.getFullYear();
+                
+                return (
+                  <div key={pessoa.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={pessoa.foto_url} alt={pessoa.nome_completo} />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {pessoa.nome_completo.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{pessoa.nome_completo}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {dataNasc.getDate()}/{dataNasc.getMonth() + 1} - {idade} anos
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {pessoa.telefone && (
+                        <Button size="sm" variant="outline">
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {pessoa.email && (
+                        <Button size="sm" variant="outline">
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="grid gap-4">
-          {aniversariantes.map((pessoa) => {
-            const dataNasc = new Date(pessoa.data_nascimento);
-            const idade = new Date().getFullYear() - dataNasc.getFullYear();
-            
-            return (
-              <div key={pessoa.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={pessoa.foto_url} alt={pessoa.nome_completo} />
-                  <AvatarFallback className="bg-primary/10 text-primary">
-                    {pessoa.nome_completo.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h3 className="font-semibold">{pessoa.nome_completo}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {dataNasc.getDate()}/{dataNasc.getMonth() + 1} - {idade} anos
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  {pessoa.telefone && (
-                    <Button size="sm" variant="outline">
-                      <MessageCircle className="h-4 w-4" />
-                    </Button>
-                  )}
-                  {pessoa.email && (
-                    <Button size="sm" variant="outline">
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      )}
+
+      {activeSubTab === 'configuracoes' && (
+        <BirthdayNotificationSettings />
       )}
     </div>
   );
