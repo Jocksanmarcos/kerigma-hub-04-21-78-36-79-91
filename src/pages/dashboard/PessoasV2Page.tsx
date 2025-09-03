@@ -37,6 +37,8 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ModalAdicionarPessoa } from '@/components/missoes/modals/ModalAdicionarPessoa';
+import GestaoFamilias from '@/components/familias/GestaoFamilias';
+import MapaLocalizacao from '@/components/localizacao/MapaLocalizacao';
 
 interface KPIData {
   novosMembros: number;
@@ -523,40 +525,12 @@ const AnalisesContent: React.FC<AnalisesContentProps> = ({ kpiData }) => {
 
 // Componente para gestão de famílias
 const FamiliasContent: React.FC = () => {
-  return (
-    <div className="space-y-4">
-      <div className="text-center py-8">
-        <Heart className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Gestão de Famílias</h3>
-        <p className="text-muted-foreground mb-4">
-          Organize e gerencie vínculos familiares entre os membros
-        </p>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Vincular Família
-        </Button>
-      </div>
-    </div>
-  );
+  return <GestaoFamilias />;
 };
 
 // Componente para mapeamento por localização
 const LocalizacaoContent: React.FC = () => {
-  return (
-    <div className="space-y-4">
-      <div className="text-center py-8">
-        <MapPin className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Mapeamento por Localização</h3>
-        <p className="text-muted-foreground mb-4">
-          Visualize a distribuição geográfica dos membros da igreja
-        </p>
-        <Button>
-          <MapPin className="h-4 w-4 mr-2" />
-          Ver Mapa
-        </Button>
-      </div>
-    </div>
-  );
+  return <MapaLocalizacao />;
 };
 
 const PessoasV2Page: React.FC = () => {
