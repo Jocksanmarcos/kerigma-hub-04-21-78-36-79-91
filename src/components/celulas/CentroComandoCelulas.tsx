@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, MapPin, TrendingUp, Target, AlertTriangle, BookOpen } from 'lucide-react';
-import { DashboardLiderCelulaEnhanced } from './DashboardLiderCelulaEnhanced';
-import { DashboardSupervisor } from './DashboardSupervisor';
+import { DashboardLiderCelula } from './dashboards/DashboardLiderCelula';
+import { DashboardSupervisor } from './dashboards/DashboardSupervisor';
+import { DashboardPastorRede } from './dashboards/DashboardPastorRede';
 import { BibliotecaRecursos } from './BibliotecaRecursos';
 import { GestaoVisitantesEnhanced } from './GestaoVisitantesEnhanced';
+import { usePapelLideranca } from '@/hooks/usePapelLideranca';
 import { GerenciarLideresDialog } from './GerenciarLideresDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -78,7 +80,8 @@ async function fetchCelulasStats(): Promise<CelulasStats> {
 }
 
 export const CentroComandoCelulas: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('lider');
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const { papelLideranca, loading: loadingPapel } = usePapelLideranca();
   
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['celulas-stats'],
@@ -174,9 +177,9 @@ export const CentroComandoCelulas: React.FC = () => {
       {/* Main Interface */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="lider" className="flex items-center space-x-2">
+          <TabsTrigger value="dashboard" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
-            <span>Minha Célula</span>
+            <span>Dashboard</span>
           </TabsTrigger>
           <TabsTrigger value="supervisor" className="flex items-center space-x-2">
             <TrendingUp className="h-4 w-4" />
@@ -192,8 +195,16 @@ export const CentroComandoCelulas: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="lider" className="space-y-6">
-          <DashboardLiderCelulaEnhanced />
+        <TabsContent value="dashboard" className="space-y-6">
+          {loadingPapel ? (
+            <div className="p-6">Carregando...</div>
+          ) : papelLideranca === 'pastor_rede' ? (
+            <DashboardPastorRede />
+          ) : papelLideranca === 'supervisor' ? (
+            <DashboardSupervisor />
+          ) : (
+            <DashboardLiderCelula />
+          )}
         </TabsContent>
 
         <TabsContent value="supervisor" className="space-y-6">

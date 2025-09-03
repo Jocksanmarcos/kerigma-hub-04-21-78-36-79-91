@@ -1893,6 +1893,7 @@ export type Database = {
           meta_visitantes_mes: number | null
           nome: string
           observacoes: string | null
+          pastor_rede_id: string | null
           rede_id: string | null
           saude_celula: string | null
           status: string | null
@@ -1927,6 +1928,7 @@ export type Database = {
           meta_visitantes_mes?: number | null
           nome: string
           observacoes?: string | null
+          pastor_rede_id?: string | null
           rede_id?: string | null
           saude_celula?: string | null
           status?: string | null
@@ -1961,6 +1963,7 @@ export type Database = {
           meta_visitantes_mes?: number | null
           nome?: string
           observacoes?: string | null
+          pastor_rede_id?: string | null
           rede_id?: string | null
           saude_celula?: string | null
           status?: string | null
@@ -1999,6 +2002,13 @@ export type Database = {
           {
             foreignKeyName: "celulas_lider_id_fkey"
             columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "celulas_pastor_rede_id_fkey"
+            columns: ["pastor_rede_id"]
             isOneToOne: false
             referencedRelation: "pessoas"
             referencedColumns: ["id"]
@@ -4869,6 +4879,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      insights_celulas: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          data_analise: string
+          descricao: string
+          entidade_id: string
+          id: string
+          metrica_principal: Json | null
+          nivel_hierarquia: string
+          prioridade: string | null
+          tipo_insight: string
+          titulo: string
+          visualizado_por: string[] | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          data_analise: string
+          descricao: string
+          entidade_id: string
+          id?: string
+          metrica_principal?: Json | null
+          nivel_hierarquia: string
+          prioridade?: string | null
+          tipo_insight: string
+          titulo: string
+          visualizado_por?: string[] | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          data_analise?: string
+          descricao?: string
+          entidade_id?: string
+          id?: string
+          metrica_principal?: Json | null
+          nivel_hierarquia?: string
+          prioridade?: string | null
+          tipo_insight?: string
+          titulo?: string
+          visualizado_por?: string[] | null
+        }
+        Relationships: []
       }
       insights_pastorais: {
         Row: {
@@ -7968,11 +8023,13 @@ export type Database = {
           foto_url: string | null
           genero: string | null
           id: string
+          lider_direto_id: string | null
           mae_id: string | null
           ministerios: string[] | null
           nome_completo: string
           observacoes: string | null
           pai_id: string | null
+          papel_lideranca: string | null
           profile_id: string | null
           responsavel_principal_familia: boolean | null
           situacao: string | null
@@ -8010,11 +8067,13 @@ export type Database = {
           foto_url?: string | null
           genero?: string | null
           id?: string
+          lider_direto_id?: string | null
           mae_id?: string | null
           ministerios?: string[] | null
           nome_completo: string
           observacoes?: string | null
           pai_id?: string | null
+          papel_lideranca?: string | null
           profile_id?: string | null
           responsavel_principal_familia?: boolean | null
           situacao?: string | null
@@ -8052,11 +8111,13 @@ export type Database = {
           foto_url?: string | null
           genero?: string | null
           id?: string
+          lider_direto_id?: string | null
           mae_id?: string | null
           ministerios?: string[] | null
           nome_completo?: string
           observacoes?: string | null
           pai_id?: string | null
+          papel_lideranca?: string | null
           profile_id?: string | null
           responsavel_principal_familia?: boolean | null
           situacao?: string | null
@@ -8106,6 +8167,13 @@ export type Database = {
             columns: ["familia_id"]
             isOneToOne: false
             referencedRelation: "familias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pessoas_lider_direto_id_fkey"
+            columns: ["lider_direto_id"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
             referencedColumns: ["id"]
           },
           {
@@ -9276,6 +9344,101 @@ export type Database = {
           {
             foreignKeyName: "relatorios_celula_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relatorios_celulas: {
+        Row: {
+          aprovado_por: string | null
+          celula_id: string
+          clima_reuniao: string | null
+          created_at: string
+          criado_por: string | null
+          data_reuniao: string
+          decisoes: number
+          id: string
+          lider_relatorio_id: string | null
+          metadata: Json | null
+          observacoes: string | null
+          oferta: number | null
+          pontos_fortes: string[] | null
+          pontos_melhoria: string[] | null
+          presentes: number
+          proximos_passos: string[] | null
+          status: string | null
+          updated_at: string
+          visitantes: number
+        }
+        Insert: {
+          aprovado_por?: string | null
+          celula_id: string
+          clima_reuniao?: string | null
+          created_at?: string
+          criado_por?: string | null
+          data_reuniao: string
+          decisoes?: number
+          id?: string
+          lider_relatorio_id?: string | null
+          metadata?: Json | null
+          observacoes?: string | null
+          oferta?: number | null
+          pontos_fortes?: string[] | null
+          pontos_melhoria?: string[] | null
+          presentes?: number
+          proximos_passos?: string[] | null
+          status?: string | null
+          updated_at?: string
+          visitantes?: number
+        }
+        Update: {
+          aprovado_por?: string | null
+          celula_id?: string
+          clima_reuniao?: string | null
+          created_at?: string
+          criado_por?: string | null
+          data_reuniao?: string
+          decisoes?: number
+          id?: string
+          lider_relatorio_id?: string | null
+          metadata?: Json | null
+          observacoes?: string | null
+          oferta?: number | null
+          pontos_fortes?: string[] | null
+          pontos_melhoria?: string[] | null
+          presentes?: number
+          proximos_passos?: string[] | null
+          status?: string | null
+          updated_at?: string
+          visitantes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relatorios_celulas_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "relatorios_celulas_celula_id_fkey"
+            columns: ["celula_id"]
+            isOneToOne: false
+            referencedRelation: "celulas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "relatorios_celulas_criado_por_fkey"
+            columns: ["criado_por"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "relatorios_celulas_lider_relatorio_id_fkey"
+            columns: ["lider_relatorio_id"]
             isOneToOne: false
             referencedRelation: "pessoas"
             referencedColumns: ["id"]
@@ -11546,6 +11709,13 @@ export type Database = {
           telefone: string
         }[]
       }
+      get_celulas_responsabilidade: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          celula_id: string
+          papel: string
+        }[]
+      }
       get_complete_family: {
         Args: { p_pessoa_id: string }
         Returns: {
@@ -11570,6 +11740,10 @@ export type Database = {
           total_membros: number
           visitantes_acompanhar: number
         }[]
+      }
+      get_papel_lideranca: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_pastor_missao_id: {
         Args: { uid?: string }
