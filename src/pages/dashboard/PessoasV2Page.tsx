@@ -68,6 +68,7 @@ import {
 } from 'recharts';
 import { ModalAdicionarPessoa } from '@/components/missoes/modals/ModalAdicionarPessoa';
 import { ModalPerfilPessoa } from '@/components/pessoas/ModalPerfilPessoa';
+import { ModalEditarPessoa } from '@/components/pessoas/ModalEditarPessoa';
 import GestaoFamilias from '@/components/familias/GestaoFamilias';
 import MapaLocalizacao from '@/components/localizacao/MapaLocalizacao';
 
@@ -882,6 +883,7 @@ const PessoasV2Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPessoa, setSelectedPessoa] = useState<Pessoa | null>(null);
   const [isPerfilModalOpen, setIsPerfilModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
   // KPI Intelligent Cards state
@@ -1025,10 +1027,9 @@ const PessoasV2Page: React.FC = () => {
         setIsPerfilModalOpen(true);
         break;
       case 'edit':
-        toast({
-          title: 'Editar Pessoa',
-          description: `Editando ${pessoa.nome_completo}`,
-        });
+        setSelectedPessoa(pessoa);
+        setIsPerfilModalOpen(false); // Fechar modal de perfil se estiver aberto
+        setIsEditModalOpen(true);
         break;
       case 'deactivate':
         toast({
@@ -1517,16 +1518,31 @@ const PessoasV2Page: React.FC = () => {
         onSuccess={handleModalSuccess}
       />
 
-      {/* Modal para visualizar perfil da pessoa */}
-      <ModalPerfilPessoa
-        pessoa={selectedPessoa}
-        isOpen={isPerfilModalOpen}
-        onClose={() => {
-          setIsPerfilModalOpen(false);
-          setSelectedPessoa(null);
-        }}
-        onAction={handleMemberAction}
-      />
+        {/* Modal para visualizar perfil da pessoa */}
+        <ModalPerfilPessoa
+          pessoa={selectedPessoa}
+          isOpen={isPerfilModalOpen}
+          onClose={() => {
+            setIsPerfilModalOpen(false);
+            setSelectedPessoa(null);
+          }}
+          onAction={handleMemberAction}
+        />
+
+        {/* Modal para editar pessoa */}
+        <ModalEditarPessoa
+          pessoa={selectedPessoa}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedPessoa(null);
+          }}
+          onSuccess={() => {
+            fetchPessoas(); // Recarregar lista
+            setIsEditModalOpen(false);
+            setSelectedPessoa(null);
+          }}
+        />
     </AppLayout>
   );
 };
