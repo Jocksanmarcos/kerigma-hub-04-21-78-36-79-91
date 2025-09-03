@@ -32,22 +32,33 @@ export const AddMemberDialog: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Buscar a pessoa e célula do líder
+      // Buscar a pessoa do usuário atual
       const { data: pessoa } = await supabase
         .from('pessoas')
-        .select('id, celula_id')
+        .select('id')
         .eq('user_id', user.id)
         .single();
 
-      if (!pessoa?.celula_id) {
-        throw new Error('Líder não está associado a uma célula');
+      if (!pessoa) {
+        throw new Error('Pessoa não encontrada para o usuário atual');
+      }
+
+      // Buscar a célula onde a pessoa é líder
+      const { data: celula } = await supabase
+        .from('celulas')
+        .select('id')
+        .eq('lider_id', pessoa.id)
+        .single();
+
+      if (!celula) {
+        throw new Error('Célula não encontrada para este líder');
       }
 
       // Adicionar como participante da célula diretamente
       const { data: novoParticipante, error: participanteError } = await supabase
         .from('participantes_celulas')
         .insert({
-          celula_id: pessoa.celula_id,
+          celula_id: celula.id,
           nome: novoMembro.nome_completo,
           telefone: novoMembro.telefone,
           email: novoMembro.email,
