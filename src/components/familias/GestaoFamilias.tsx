@@ -121,6 +121,24 @@ const GestaoFamilias: React.FC = () => {
 
   const criarNovaFamilia = async (nomeFamilia: string, pessoaId: string) => {
     try {
+      // Verificar se a pessoa já está vinculada a uma família
+      const { data: pessoaExistente, error: pessoaError } = await supabase
+        .from('pessoas')
+        .select('familia_id')
+        .eq('id', pessoaId)
+        .single();
+
+      if (pessoaError) throw pessoaError;
+
+      if (pessoaExistente.familia_id) {
+        toast({
+          title: 'Aviso',
+          description: 'Esta pessoa já está vinculada a uma família.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Criar família
       const { data: novaFamilia, error: familiaError } = await supabase
         .from('familias')
