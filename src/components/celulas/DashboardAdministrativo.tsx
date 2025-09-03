@@ -19,7 +19,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CriarCelulaDialog } from './CriarCelulaDialog';
-import { GerenciarLideresDialog } from './GerenciarLideresDialog';
+
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -42,7 +42,6 @@ interface CelulaAdmin {
 
 export const DashboardAdministrativo: React.FC = () => {
   const [showCriarCelula, setShowCriarCelula] = useState(false);
-  const [showGerenciarLideres, setShowGerenciarLideres] = useState(false);
   const [filtro, setFiltro] = useState('');
   const { toast } = useToast();
 
@@ -197,10 +196,6 @@ export const DashboardAdministrativo: React.FC = () => {
           <p className="text-muted-foreground">Painel administrativo completo</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setShowGerenciarLideres(true)} variant="outline">
-            <UserCheck className="h-4 w-4 mr-2" />
-            Gerenciar Líderes
-          </Button>
           <Button onClick={() => setShowCriarCelula(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Nova Célula
@@ -407,7 +402,7 @@ export const DashboardAdministrativo: React.FC = () => {
         onSuccess={refetch}
       />
 
-      <GerenciarLideresDialog />
+      
     </div>
   );
 };
