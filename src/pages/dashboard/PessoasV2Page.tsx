@@ -813,10 +813,10 @@ const PessoasV2Page: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="w-full overflow-hidden min-h-screen bg-background">
+      <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-background">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-          <div className="p-4 sm:p-6">
+          <div className="w-full max-w-full overflow-x-hidden p-4 sm:p-6">
             <div className="space-y-4">
               {/* Título e Subtítulo */}
               <div>
@@ -835,7 +835,7 @@ const PessoasV2Page: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6 space-y-6">
+        <div className="w-full max-w-full overflow-x-hidden p-4 sm:p-6 space-y-6">
           {/* KPI Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <KPICard
