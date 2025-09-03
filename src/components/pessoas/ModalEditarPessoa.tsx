@@ -78,7 +78,7 @@ export const ModalEditarPessoa: React.FC<ModalEditarPessoaProps> = ({
         situacao: pessoa.situacao || 'ativo',
         data_nascimento: pessoa.data_nascimento || '',
         data_membresia: pessoa.data_membresia || '',
-        celula_id: pessoa.celula_id || '',
+        celula_id: pessoa.celula_id || 'none',
         endereco: (pessoa as any).endereco || '',
         observacoes: (pessoa as any).observacoes || '',
         dons_talentos: pessoa.dons_talentos || []
@@ -129,7 +129,7 @@ export const ModalEditarPessoa: React.FC<ModalEditarPessoaProps> = ({
         situacao: formData.situacao,
         data_nascimento: formData.data_nascimento || null,
         data_membresia: formData.data_membresia || null,
-        celula_id: formData.celula_id || null,
+        celula_id: formData.celula_id === 'none' ? null : formData.celula_id || null,
         endereco: formData.endereco || null,
         observacoes: formData.observacoes || null,
         dons_talentos: formData.dons_talentos.length > 0 ? formData.dons_talentos : null,
@@ -277,7 +277,7 @@ export const ModalEditarPessoa: React.FC<ModalEditarPessoaProps> = ({
                 <SelectValue placeholder="Selecione uma célula" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhuma célula</SelectItem>
+                <SelectItem value="none">Nenhuma célula</SelectItem>
                 {celulas.map((celula) => (
                   <SelectItem key={celula.id} value={celula.id}>
                     {celula.nome}
