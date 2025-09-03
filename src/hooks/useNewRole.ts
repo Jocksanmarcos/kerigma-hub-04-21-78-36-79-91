@@ -95,6 +95,6 @@ export const newRolePermissions: Record<UserRole, { name: string; pages: string[
   },
   membro: {
     name: 'Membro',
-    pages: ['dashboard', 'agenda', 'eventos', 'ensino', 'aconselhamento']
+    pages: ['dashboard', 'agenda', 'eventos', 'ensino', 'aconselhamento', 'membro']
   }
 };

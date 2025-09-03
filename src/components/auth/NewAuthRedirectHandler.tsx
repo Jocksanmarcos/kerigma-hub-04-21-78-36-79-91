@@ -24,7 +24,7 @@ const NewAuthRedirectHandler: React.FC = () => {
         } else if (userRole === 'lider') {
           navigate("/admin/celulas", { replace: true });
         } else if (userRole === 'membro') {
-          navigate("/dashboard/agenda", { replace: true });
+          navigate("/membro/dashboard", { replace: true });
         } else {
           // Default fallback
           navigate("/dashboard", { replace: true });
