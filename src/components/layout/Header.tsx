@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
       {/* Top header bar - 3-part balanced layout */}
       <div className="h-16 flex items-center justify-between px-4 lg:px-6">
         {/* Left section - Navigation */}
-        <div className="flex items-center gap-4 flex-1">
+        <div className="flex items-center gap-2 md:gap-4 flex-1">
           <SidebarTrigger />
         </div>
 
