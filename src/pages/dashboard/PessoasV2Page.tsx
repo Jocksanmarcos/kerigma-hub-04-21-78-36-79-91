@@ -382,6 +382,7 @@ const ListaMembro: React.FC<ListaMembroProps> = ({ pessoas, onAction }) => {
 };
 
 const PessoasV2Page: React.FC = () => {
+  // Main state management - Mobile First foundation
   const [activeTab, setActiveTab] = useState('diretorio');
   const [viewMode, setViewMode] = useState<'lista' | 'cards'>('cards');
   const [filtrosPessoas, setFiltrosPessoas] = useState<FiltrosPessoas>({
@@ -396,6 +397,7 @@ const PessoasV2Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
 
+  // KPI Intelligent Cards state
   const [kpiData, setKpiData] = useState<KPIData>({
     novosMembros: 0,
     visitantes: 0,
