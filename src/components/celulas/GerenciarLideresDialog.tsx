@@ -7,11 +7,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Users, UserCheck, Crown } from 'lucide-react';
 
+interface Celula {
+  id: string;
+  nome: string;
+  lider_id: string | null;
+  lider_nome?: string;
+}
+
+interface Pessoa {
+  id: string;
+  nome_completo: string;
+  telefone: string | null;
+}
+
 export const GerenciarLideresDialog: React.FC = () => {
   const [selectedCelula, setSelectedCelula] = useState<string>('');
   const [selectedPessoa, setSelectedPessoa] = useState<string>('');
-  const [celulas, setCelulas] = useState<any[]>([]);
-  const [pessoas, setPessoas] = useState<any[]>([]);
+  const [celulas, setCelulas] = useState<Celula[]>([]);
+  const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -28,24 +41,27 @@ export const GerenciarLideresDialog: React.FC = () => {
       setLoading(true);
       
       // Buscar células
-      const celulasResponse = await supabase
+      const { data: celulasData, error: celulasError } = await supabase
         .from('celulas')
         .select('id, nome, lider_id')
         .eq('ativa', true)
         .order('nome');
 
-      if (celulasResponse.error) throw celulasResponse.error;
-      setCelulas(celulasResponse.data || []);
+      if (celulasError) throw celulasError;
+      setCelulas(celulasData || []);
 
-      // Buscar pessoas  
-      const { data: pessoasData, error: pessoasError } = await supabase
+      // Buscar pessoas com tipagem explícita
+      const pessoasResponse = await supabase
         .from('pessoas')
-        .select('id, nome_completo, telefone')
-        .eq('ativo', true)
-        .order('nome_completo');
-
-      if (pessoasError) throw pessoasError;
-      setPessoas(pessoasData || []);
+        .select('id, nome_completo, telefone');
+      
+      if (pessoasResponse.error) throw pessoasResponse.error;
+      
+      const filteredPessoas = (pessoasResponse.data || []).filter((p): p is Pessoa => {
+        return p.id && p.nome_completo && typeof p.id === 'string' && typeof p.nome_completo === 'string';
+      });
+      
+      setPessoas(filteredPessoas);
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
       toast({
@@ -70,12 +86,12 @@ export const GerenciarLideresDialog: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await supabase
+      const { error } = await supabase
         .from('celulas')
         .update({ lider_id: selectedPessoa })
         .eq('id', selectedCelula);
 
-      if (response.error) throw response.error;
+      if (error) throw error;
 
       toast({
         title: "Líder designado!",
@@ -100,12 +116,12 @@ export const GerenciarLideresDialog: React.FC = () => {
   const handleRemoverLider = async (celulaId: string) => {
     try {
       setLoading(true);
-      const response = await supabase
+      const { error } = await supabase
         .from('celulas')
         .update({ lider_id: null })
         .eq('id', celulaId);
 
-      if (response.error) throw response.error;
+      if (error) throw error;
 
       toast({
         title: "Líder removido!",
