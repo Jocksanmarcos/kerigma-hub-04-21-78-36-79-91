@@ -311,8 +311,8 @@ const ListaMembro: React.FC<ListaMembroProps> = ({ pessoas, onAction }) => {
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
+    <div className="w-full overflow-x-auto border rounded-lg">
+      <table className="w-full min-w-[600px]">
         <thead className="border-b">
           <tr>
             <th className="text-left py-3 px-4 font-medium text-muted-foreground">Pessoa</th>
