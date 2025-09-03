@@ -292,12 +292,41 @@ const GestaoFamilias: React.FC = () => {
     }
 
     try {
-      const { error } = await supabase
+      // Verificar se já existe vínculo na tabela vinculos_familiares
+      const { data: vinculoExistente } = await supabase
+        .from('vinculos_familiares')
+        .select('id')
+        .eq('pessoa_id', selectedPessoa)
+        .single();
+
+      if (vinculoExistente) {
+        toast({
+          title: 'Aviso',
+          description: 'Esta pessoa já possui vínculo familiar.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Atualizar na tabela pessoas
+      const { error: updateError } = await supabase
         .from('pessoas')
         .update({ familia_id: selectedFamilia })
         .eq('id', selectedPessoa);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // Criar vínculo na tabela vinculos_familiares
+      const { error: vinculoError } = await supabase
+        .from('vinculos_familiares')
+        .insert({
+          familia_id: selectedFamilia,
+          pessoa_id: selectedPessoa,
+          tipo_vinculo: 'membro',
+          responsavel_familiar: false
+        });
+
+      if (vinculoError) throw vinculoError;
 
       toast({
         title: 'Sucesso',
@@ -307,6 +336,7 @@ const GestaoFamilias: React.FC = () => {
       // Recarregar dados
       loadFamilias();
       loadPessoasSemFamilia();
+      loadPessoasComVinculosInconsistentes();
       setSelectedPessoa('');
       setSelectedFamilia('');
     } catch (error) {
