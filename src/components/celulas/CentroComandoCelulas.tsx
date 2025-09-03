@@ -5,9 +5,11 @@ import { Users, MapPin, TrendingUp, Target, AlertTriangle, BookOpen } from 'luci
 import { DashboardLiderCelula } from './dashboards/DashboardLiderCelula';
 import { DashboardSupervisor } from './dashboards/DashboardSupervisor';
 import { DashboardPastorRede } from './dashboards/DashboardPastorRede';
+import { DashboardAdministrativo } from './DashboardAdministrativo';
 import { BibliotecaRecursos } from './BibliotecaRecursos';
 import { GestaoVisitantesEnhanced } from './GestaoVisitantesEnhanced';
 import { usePapelLideranca } from '@/hooks/usePapelLideranca';
+import { useCurrentPerson } from '@/hooks/useCurrentPerson';
 import { GerenciarLideresDialog } from './GerenciarLideresDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -82,6 +84,7 @@ async function fetchCelulasStats(): Promise<CelulasStats> {
 export const CentroComandoCelulas: React.FC = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { papelLideranca, loading: loadingPapel } = usePapelLideranca();
+  const { pessoa } = useCurrentPerson();
   
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['celulas-stats'],
@@ -197,13 +200,49 @@ export const CentroComandoCelulas: React.FC = () => {
 
         <TabsContent value="dashboard" className="space-y-6">
           {loadingPapel ? (
-            <div className="p-6">Carregando...</div>
-          ) : papelLideranca === 'pastor_rede' ? (
-            <DashboardPastorRede />
-          ) : papelLideranca === 'supervisor' ? (
-            <DashboardSupervisor />
+            <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p>Carregando painel...</p>
+            </div>
           ) : (
-            <DashboardLiderCelula />
+            // Lógica de visão adaptativa baseada no papel + verificação de admin
+            (() => {
+              // Se é admin (não tem papel específico), mostrar painel administrativo
+              if (!papelLideranca || papelLideranca === 'membro') {
+                // Verificar se é admin pelo user_id
+                if (pessoa?.user_id && (
+                  pessoa.user_id === '6b87ee9e-4a6f-4c2e-8be0-7c8b6e6f0a8d' || // jocksan.marcos
+                  pessoa.email?.includes('admin') ||
+                  pessoa.email?.includes('jocksan')
+                )) {
+                  return <DashboardAdministrativo />;
+                }
+                // Se não é admin e não tem papel, mostrar mensagem
+                return (
+                  <div className="text-center p-12">
+                    <h2 className="text-xl font-semibold mb-4">Você não está cadastrado como líder de célula</h2>
+                    <p className="text-muted-foreground mb-6">
+                      Para acessar as funcionalidades de células, você precisa ser designado como líder de uma célula.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Entre em contato com um administrador para ser designado como líder.
+                    </p>
+                  </div>
+                );
+              }
+
+              // Dashboards específicos por papel
+              if (papelLideranca === 'pastor_rede') {
+                return <DashboardPastorRede />;
+              } else if (papelLideranca === 'supervisor') {
+                return <DashboardSupervisor />;
+              } else if (papelLideranca === 'lider_celula') {
+                return <DashboardLiderCelula />;
+              }
+
+              // Fallback
+              return <DashboardLiderCelula />;
+            })()
           )}
         </TabsContent>
 
