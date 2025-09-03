@@ -265,7 +265,7 @@ const GestaoFamilias: React.FC = () => {
         .from('familias')
         .select('id, nome_familia')
         .eq('nome_familia', nomeFamilia)
-        .single();
+        .maybeSingle();
 
       let familiaId: string;
 
@@ -290,19 +290,17 @@ const GestaoFamilias: React.FC = () => {
       }
 
       // Verificar se a pessoa já está vinculada
-      const { data: pessoaExistente, error: pessoaError } = await supabase
+      const { data: pessoaExistente } = await supabase
         .from('pessoas')
         .select('familia_id')
         .eq('id', pessoaId)
-        .single();
-
-      if (pessoaError) throw pessoaError;
+        .maybeSingle();
 
       const { data: vinculoExistente } = await supabase
         .from('vinculos_familiares')
         .select('id, familia_id')
         .eq('pessoa_id', pessoaId)
-        .single();
+        .maybeSingle();
 
       if (vinculoExistente) {
         toast({
@@ -313,7 +311,7 @@ const GestaoFamilias: React.FC = () => {
         return;
       }
 
-      if (pessoaExistente.familia_id) {
+      if (pessoaExistente?.familia_id) {
         toast({
           title: 'Aviso',
           description: 'Esta pessoa já está vinculada a uma família.',
