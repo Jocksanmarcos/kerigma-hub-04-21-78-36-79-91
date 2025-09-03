@@ -12,6 +12,10 @@ import { AcoesEmMassa } from './AcoesEmMassa';
 import { CelulasProntasMultiplicacao } from './CelulasProntasMultiplicacao';
 import { GrelhaSaudeCelulas } from './GrelhaSaudeCelulas';
 import { FluxoAcompanhamentoAutomatizado } from './FluxoAcompanhamentoAutomatizado';
+import { MetricasCelulas } from './MetricasCelulas';
+import { FerramentasGestao } from './FerramentasGestao';
+import { RelatoriosAvancados } from './RelatoriosAvancados';
+import { ComunicacaoInteligente } from './ComunicacaoInteligente';
 
 interface CelulaSupervisao {
   id: string;
@@ -99,6 +103,10 @@ export const DashboardSupervisor: React.FC = () => {
       <CelulasProntasMultiplicacao />
       <GrelhaSaudeCelulas />
       <FluxoAcompanhamentoAutomatizado />
+      <MetricasCelulas />
+      <FerramentasGestao />
+      <RelatoriosAvancados />
+      <ComunicacaoInteligente />
     </div>
   );
 };

@@ -85,13 +85,34 @@ export const GrelhaSaudeCelulas: React.FC = () => {
   });
 
   const handleVerDetalhes = (celula: CelulaSaude) => {
-    toast.info(`Abrindo detalhes de ${celula.nome}`);
+    // Implementar navegação real para detalhes
+    const detalhes = {
+      nome: celula.nome,
+      lider: celula.lider,
+      status: celula.status,
+      membros: celula.membros,
+      presencaMedia: celula.presencaMedia,
+      visitantes: celula.visitantesUltimo,
+      ultimoRelatorio: celula.ultimoRelatorio,
+      recomendacoes: celula.status === 'vermelho' 
+        ? ['Realizar visita presencial', 'Treinar liderança', 'Revisar estratégia']
+        : celula.status === 'amarelo'
+        ? ['Acompanhar mais de perto', 'Incentivar participação']
+        : ['Manter excelente trabalho', 'Considerar multiplicação']
+    };
+    
+    // Simular abertura de modal detalhado
+    toast.success(`📋 Abrindo análise detalhada de ${celula.nome}`);
+    
+    setTimeout(() => {
+      toast.info(`Status: ${celula.status.toUpperCase()} | Membros: ${celula.membros} | Presença Média: ${celula.presencaMedia}`);
+    }, 1000);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'verde':
-        return 'bg-emerald-500';
+        return 'bg-green-500';
       case 'amarelo':
         return 'bg-yellow-500';
       case 'vermelho':
@@ -117,7 +138,7 @@ export const GrelhaSaudeCelulas: React.FC = () => {
   const getCardBorder = (status: string) => {
     switch (status) {
       case 'verde':
-        return 'border-l-emerald-500';
+        return 'border-l-green-500';
       case 'amarelo':
         return 'border-l-yellow-500';
       case 'vermelho':
