@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Plus, Trash2, Check, X, Edit } from 'lucide-react';
 
@@ -70,6 +70,7 @@ const tiposParentesco = [
 ];
 
 export default function GerenciarParentescos({ pessoaId, nomePessoa, familiaId, onClose }: GerenciarParentescosProps) {
+  const { toast } = useToast();
   const [vinculos, setVinculos] = useState<VinculoFamiliar[]>([]);
   const [pessoasDaFamilia, setPessoasDaFamilia] = useState<Pessoa[]>([]);
   const [novoVinculo, setNovoVinculo] = useState({
@@ -125,7 +126,14 @@ export default function GerenciarParentescos({ pessoaId, nomePessoa, familiaId, 
   };
 
   const criarVinculo = async () => {
+    console.log('🔗 Iniciando criação de vínculo:', {
+      pessoaId,
+      familiaId,
+      novoVinculo
+    });
+
     if (!novoVinculo.pessoa_relacionada_id || !novoVinculo.tipo_vinculo) {
+      console.log('❌ Dados insuficientes');
       toast({
         title: 'Aviso',
         description: 'Selecione uma pessoa e o tipo de parentesco.',
@@ -136,19 +144,37 @@ export default function GerenciarParentescos({ pessoaId, nomePessoa, familiaId, 
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      console.log('📝 Inserindo dados na tabela vinculos_familiares...');
+      
+      const dadosInsercao = {
+        familia_id: familiaId,
+        pessoa_id: pessoaId,
+        pessoa_relacionada_id: novoVinculo.pessoa_relacionada_id,
+        tipo_vinculo: novoVinculo.tipo_vinculo as any,
+        observacoes_parentesco: novoVinculo.observacoes,
+        confirmado: false
+      };
+      
+      console.log('📋 Dados para inserção:', dadosInsercao);
+
+      const { data, error } = await supabase
         .from('vinculos_familiares')
-        .insert({
-          familia_id: familiaId,
-          pessoa_id: pessoaId,
-          pessoa_relacionada_id: novoVinculo.pessoa_relacionada_id,
-          tipo_vinculo: novoVinculo.tipo_vinculo as any,
-          observacoes_parentesco: novoVinculo.observacoes,
-          confirmado: false
+        .insert(dadosInsercao)
+        .select();
+
+      console.log('🔍 Resultado da inserção:', { data, error });
+
+      if (error) {
+        console.log('❌ Erro detalhado:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
         });
+        throw error;
+      }
 
-      if (error) throw error;
-
+      console.log('✅ Vínculo criado com sucesso!');
       toast({
         title: 'Sucesso',
         description: 'Vínculo familiar criado com sucesso!',
@@ -157,10 +183,10 @@ export default function GerenciarParentescos({ pessoaId, nomePessoa, familiaId, 
       setNovoVinculo({ pessoa_relacionada_id: '', tipo_vinculo: '', observacoes: '' });
       loadVinculos();
     } catch (error) {
-      console.error('Erro ao criar vínculo:', error);
+      console.error('💥 Erro completo ao criar vínculo:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível criar o vínculo familiar.',
+        description: `Não foi possível criar o vínculo familiar. Erro: ${error.message || 'Desconhecido'}`,
         variant: 'destructive',
       });
     } finally {
