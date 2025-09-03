@@ -86,11 +86,33 @@ async function fetchDadosLiderCelula() {
     .eq('id', pessoa.celula_id)
     .single();
 
-  // Calcular próxima reunião
+  // Calcular próxima reunião baseado no dia da semana
   const hoje = new Date();
+  const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  const diaAtual = hoje.getDay();
+  
+  // Mapear dias da semana para números (assumindo que 'quinta' = 4)
+  const diaReuniaoMap: Record<string, number> = {
+    'domingo': 0, 'segunda': 1, 'terça': 2, 'quarta': 3,
+    'quinta': 4, 'sexta': 5, 'sábado': 6
+  };
+  
+  let diaReuniao = 4; // Default quinta-feira
+  if (celula?.dia_semana) {
+    const diaLowercase = celula.dia_semana.toLowerCase();
+    diaReuniao = diaReuniaoMap[diaLowercase] || 4;
+  }
+  
+  // Calcular próxima data
+  let diasParaProxima = diaReuniao - diaAtual;
+  if (diasParaProxima <= 0) diasParaProxima += 7;
+  
+  const proximaData = new Date(hoje);
+  proximaData.setDate(hoje.getDate() + diasParaProxima);
+  
   const proximaReuniao: ProximaReuniao = {
     id: '1',
-    data: 'Quinta-feira',
+    data: proximaData.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }),
     horario: celula?.horario || '19:30',
     endereco: celula?.endereco || 'Endereço não cadastrado',
     tema: 'O Poder da Oração',
@@ -484,26 +506,26 @@ export const DashboardLiderCelulaEnhanced: React.FC = () => {
             <Button 
               variant="outline" 
               className="flex flex-col items-center space-y-2 h-auto py-4"
-              onClick={() => toast.info('Abrindo lista detalhada de membros')}
+              onClick={() => data?.membros && handleEnviarLembreteGeral(data.membros)}
             >
-              <Users className="h-6 w-6" />
-              <span>Gerenciar Membros</span>
+              <MessageSquare className="h-6 w-6" />
+              <span>Lembrete Geral</span>
             </Button>
             <Button 
               variant="outline" 
               className="flex flex-col items-center space-y-2 h-auto py-4"
-              onClick={() => toast.info('Abrindo agendamento de visitas')}
+              onClick={() => toast.success('Lista de presença gerada!')}
             >
-              <Calendar className="h-6 w-6" />
-              <span>Agendar Visita</span>
+              <CheckCircle2 className="h-6 w-6" />
+              <span>Lista Presença</span>
             </Button>
             <Button 
               variant="outline" 
               className="flex flex-col items-center space-y-2 h-auto py-4"
-              onClick={() => toast.info('Abrindo histórico da célula')}
+              onClick={() => toast.info('Formulário de visitante sendo preparado...')}
             >
-              <Clock className="h-6 w-6" />
-              <span>Histórico</span>
+              <Plus className="h-6 w-6" />
+              <span>Add Visitante</span>
             </Button>
           </div>
         </CardContent>
