@@ -14,6 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
   Users, 
   UserPlus, 
@@ -38,7 +45,10 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle,
-  Settings
+  Settings,
+  Edit,
+  Trash2,
+  UserX
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -254,14 +264,42 @@ const CardMembro: React.FC<CardMembroProps> = ({ pessoa, onAction }) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-foreground truncate">{pessoa.nome_completo}</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-                onClick={() => onAction('more', pessoa)}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => onAction('view', pessoa)}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Ver Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onAction('edit', pessoa)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => onAction('deactivate', pessoa)}
+                    className="text-orange-600"
+                  >
+                    <UserX className="h-4 w-4 mr-2" />
+                    Desativar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => onAction('delete', pessoa)}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
             <div className="space-y-1">
@@ -402,6 +440,38 @@ const ListaMembro: React.FC<ListaMembroProps> = ({ pessoas, onAction }) => {
                       <MessageCircle className="h-4 w-4" />
                     </Button>
                   )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => onAction('edit', pessoa)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => onAction('deactivate', pessoa)}
+                        className="text-orange-600"
+                      >
+                        <UserX className="h-4 w-4 mr-2" />
+                        Desativar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onAction('delete', pessoa)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </td>
             </tr>
@@ -948,7 +1018,30 @@ const PessoasV2Page: React.FC = () => {
         }
         break;
       case 'view':
-        // Navigate to person detail page
+        toast({
+          title: 'Visualizar Perfil',
+          description: `Abrindo perfil de ${pessoa.nome_completo}`,
+        });
+        break;
+      case 'edit':
+        toast({
+          title: 'Editar Pessoa',
+          description: `Editando ${pessoa.nome_completo}`,
+        });
+        break;
+      case 'deactivate':
+        toast({
+          title: 'Desativar Pessoa',
+          description: `${pessoa.nome_completo} será desativado(a)`,
+          variant: 'destructive',
+        });
+        break;
+      case 'delete':
+        toast({
+          title: 'Excluir Pessoa',
+          description: `${pessoa.nome_completo} será excluído(a) permanentemente`,
+          variant: 'destructive',
+        });
         break;
       default:
         break;
