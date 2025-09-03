@@ -121,7 +121,7 @@ const GestaoFamilias: React.FC = () => {
 
   const criarNovaFamilia = async (nomeFamilia: string, pessoaId: string) => {
     try {
-      // Verificar se a pessoa já está vinculada a uma família
+      // Verificar se a pessoa já está vinculada a uma família (tanto na tabela pessoas quanto vinculos_familiares)
       const { data: pessoaExistente, error: pessoaError } = await supabase
         .from('pessoas')
         .select('familia_id')
@@ -139,6 +139,22 @@ const GestaoFamilias: React.FC = () => {
         return;
       }
 
+      // Verificar se já existe vínculo na tabela vinculos_familiares
+      const { data: vinculoExistente } = await supabase
+        .from('vinculos_familiares')
+        .select('id')
+        .eq('pessoa_id', pessoaId)
+        .single();
+
+      if (vinculoExistente) {
+        toast({
+          title: 'Aviso',
+          description: 'Esta pessoa já possui vínculo familiar.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Criar família
       const { data: novaFamilia, error: familiaError } = await supabase
         .from('familias')
@@ -148,13 +164,25 @@ const GestaoFamilias: React.FC = () => {
 
       if (familiaError) throw familiaError;
 
-      // Vincular pessoa à família
+      // Vincular pessoa à família na tabela pessoas
       const { error: updateError } = await supabase
         .from('pessoas')
         .update({ familia_id: novaFamilia.id })
         .eq('id', pessoaId);
 
       if (updateError) throw updateError;
+
+      // Criar vínculo na tabela vinculos_familiares
+      const { error: vinculoError } = await supabase
+        .from('vinculos_familiares')
+        .insert({
+          familia_id: novaFamilia.id,
+          pessoa_id: pessoaId,
+          tipo_vinculo: 'responsavel',
+          responsavel_familiar: true
+        });
+
+      if (vinculoError) throw vinculoError;
 
       toast({
         title: 'Sucesso',
