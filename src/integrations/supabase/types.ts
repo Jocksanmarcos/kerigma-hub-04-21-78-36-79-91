@@ -1495,6 +1495,107 @@ export type Database = {
           },
         ]
       }
+      birthday_notification_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_content: string | null
+          notification_config_id: string
+          notification_type: string
+          pessoa_id: string
+          recipient: string
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_content?: string | null
+          notification_config_id: string
+          notification_type: string
+          pessoa_id: string
+          recipient: string
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_content?: string | null
+          notification_config_id?: string
+          notification_type?: string
+          pessoa_id?: string
+          recipient?: string
+          sent_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "birthday_notification_logs_notification_config_id_fkey"
+            columns: ["notification_config_id"]
+            isOneToOne: false
+            referencedRelation: "birthday_notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "birthday_notification_logs_pessoa_id_fkey"
+            columns: ["pessoa_id"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      birthday_notifications: {
+        Row: {
+          church_id: string | null
+          created_at: string
+          days_before: number
+          id: string
+          is_active: boolean
+          message_template: string
+          notification_type: string
+          send_time: string
+          subject_template: string | null
+          updated_at: string
+        }
+        Insert: {
+          church_id?: string | null
+          created_at?: string
+          days_before?: number
+          id?: string
+          is_active?: boolean
+          message_template?: string
+          notification_type?: string
+          send_time?: string
+          subject_template?: string | null
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string | null
+          created_at?: string
+          days_before?: number
+          id?: string
+          is_active?: boolean
+          message_template?: string
+          notification_type?: string
+          send_time?: string
+          subject_template?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "birthday_notifications_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "igrejas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       books: {
         Row: {
           author: string | null
