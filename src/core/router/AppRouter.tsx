@@ -67,6 +67,7 @@ const ForcePasswordChangePage = React.lazy(() => import("@/pages/auth/ForcePassw
 const ResetPassword = React.lazy(() => import("@/pages/ResetPassword"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
 const SiteMapPage = React.lazy(() => import("@/pages/SiteMapPage"));
+const RecepcaoPage = React.lazy(() => import("@/pages/recepcao/RecepcaoPage"));
 const BibleImportPage = React.lazy(() => import("@/pages/BibleImportPage"));
 
 const MinimalLoader = () => <PageLoader type="minimal" />;
@@ -116,6 +117,9 @@ export const AppRouter: React.FC = () => {
         
         {/* Sitemap */}
         <Route path="/sitemap" element={<SiteMapPage />} />
+
+        {/* Recepção Route - Público para tablets da recepção */}
+        <Route path="/recepcao" element={<RecepcaoPage />} />
 
         {/* Protected Dashboard Routes */}
         <Route path="/admin" element={<ProtectedRoute><Index /></ProtectedRoute>} />

@@ -4070,6 +4070,71 @@ export type Database = {
         }
         Relationships: []
       }
+      formularios_recepcao: {
+        Row: {
+          como_conheceu: string | null
+          created_at: string | null
+          data_visita: string | null
+          email: string | null
+          endereco: string | null
+          id: string
+          idade: number | null
+          interessado_em: string[] | null
+          nome_completo: string
+          observacoes: string | null
+          pessoa_id: string | null
+          primeira_visita: boolean | null
+          recepcionista_nome: string | null
+          status_processamento: string | null
+          telefone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          como_conheceu?: string | null
+          created_at?: string | null
+          data_visita?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          idade?: number | null
+          interessado_em?: string[] | null
+          nome_completo: string
+          observacoes?: string | null
+          pessoa_id?: string | null
+          primeira_visita?: boolean | null
+          recepcionista_nome?: string | null
+          status_processamento?: string | null
+          telefone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          como_conheceu?: string | null
+          created_at?: string | null
+          data_visita?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          idade?: number | null
+          interessado_em?: string[] | null
+          nome_completo?: string
+          observacoes?: string | null
+          pessoa_id?: string | null
+          primeira_visita?: boolean | null
+          recepcionista_nome?: string | null
+          status_processamento?: string | null
+          telefone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "formularios_recepcao_pessoa_id_fkey"
+            columns: ["pessoa_id"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       formularios_submissoes: {
         Row: {
           created_at: string
@@ -6418,6 +6483,53 @@ export type Database = {
         }
         Relationships: []
       }
+      notas_acompanhamento_visitantes: {
+        Row: {
+          created_at: string | null
+          data_contato: string
+          id: string
+          observacoes: string | null
+          pessoa_id: string
+          proximo_contato: string | null
+          resultado: string
+          tipo_contato: string
+          updated_at: string | null
+          usuario_responsavel: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_contato?: string
+          id?: string
+          observacoes?: string | null
+          pessoa_id: string
+          proximo_contato?: string | null
+          resultado?: string
+          tipo_contato?: string
+          updated_at?: string | null
+          usuario_responsavel?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_contato?: string
+          id?: string
+          observacoes?: string | null
+          pessoa_id?: string
+          proximo_contato?: string | null
+          resultado?: string
+          tipo_contato?: string
+          updated_at?: string | null
+          usuario_responsavel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notas_acompanhamento_visitantes_pessoa_id_fkey"
+            columns: ["pessoa_id"]
+            isOneToOne: false
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notas_pastorais: {
         Row: {
           categoria: string | null
@@ -7763,6 +7875,7 @@ export type Database = {
           profile_id: string | null
           responsavel_principal_familia: boolean | null
           situacao: string | null
+          status_acompanhamento: string | null
           status_discipulado: string | null
           status_membro: string | null
           telefone: string | null
@@ -7804,6 +7917,7 @@ export type Database = {
           profile_id?: string | null
           responsavel_principal_familia?: boolean | null
           situacao?: string | null
+          status_acompanhamento?: string | null
           status_discipulado?: string | null
           status_membro?: string | null
           telefone?: string | null
@@ -7845,6 +7959,7 @@ export type Database = {
           profile_id?: string | null
           responsavel_principal_familia?: boolean | null
           situacao?: string | null
+          status_acompanhamento?: string | null
           status_discipulado?: string | null
           status_membro?: string | null
           telefone?: string | null
@@ -11258,6 +11373,10 @@ export type Database = {
       cleanup_seo_cache: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      converter_visitante_em_membro: {
+        Args: { p_pessoa_id: string }
+        Returns: Json
       }
       create_automatic_invitations: {
         Args: { p_funcao_id: string; p_plano_id: string; p_quantidade?: number }

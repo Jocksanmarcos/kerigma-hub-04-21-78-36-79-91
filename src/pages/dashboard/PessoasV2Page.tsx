@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AcompanhamentoVisitantes from '@/components/visitantes/AcompanhamentoVisitantes';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +31,8 @@ import {
   MessageCircle,
   Eye,
   MoreHorizontal,
-  Plus
+  Plus,
+  UserCheck
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -74,6 +76,7 @@ interface SegmentedNavProps {
 const SegmentedNav: React.FC<SegmentedNavProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
     { value: 'diretorio', label: 'Diretório', icon: Users },
+    { value: 'visitantes', label: 'Visitantes', icon: UserCheck },
     { value: 'aniversarios', label: 'Aniversários', icon: Calendar },
     { value: 'analises', label: 'Análises', icon: TrendingUp },
     { value: 'familias', label: 'Famílias', icon: Heart },
@@ -1102,6 +1105,11 @@ const PessoasV2Page: React.FC = () => {
                 <LocalizacaoContent />
               </CardContent>
             </Card>
+          )}
+
+          {/* Aba Visitantes */}
+          {activeTab === 'visitantes' && (
+            <AcompanhamentoVisitantes />
           )}
         </div>
       </div>
