@@ -41,9 +41,20 @@ interface Pessoa {
   foto_url?: string;
 }
 
+interface PessoaComVinculoInconsistente {
+  id: string;
+  nome_completo: string;
+  email?: string;
+  telefone?: string;
+  foto_url?: string;
+  familia_id: string;
+  nome_familia: string;
+}
+
 const GestaoFamilias: React.FC = () => {
   const [familias, setFamilias] = useState<Familia[]>([]);
   const [pessoasSemFamilia, setPessoasSemFamilia] = useState<Pessoa[]>([]);
+  const [pessoasComVinculosInconsistentes, setPessoasComVinculosInconsistentes] = useState<PessoaComVinculoInconsistente[]>([]);
   const [selectedPessoa, setSelectedPessoa] = useState<string>('');
   const [selectedFamilia, setSelectedFamilia] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,6 +65,7 @@ const GestaoFamilias: React.FC = () => {
   useEffect(() => {
     loadFamilias();
     loadPessoasSemFamilia();
+    loadPessoasComVinculosInconsistentes();
   }, []);
 
   const loadFamilias = async () => {
@@ -119,6 +131,65 @@ const GestaoFamilias: React.FC = () => {
     }
   };
 
+  const loadPessoasComVinculosInconsistentes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vinculos_familiares')
+        .select(`
+          pessoa_id,
+          familia_id,
+          pessoas!inner(nome_completo, email, telefone, foto_url, familia_id),
+          familias!inner(nome_familia)
+        `)
+        .is('pessoas.familia_id', null);
+
+      if (error) throw error;
+
+      const pessoasInconsistentes = data?.map((vinculo: any) => ({
+        id: vinculo.pessoa_id,
+        nome_completo: vinculo.pessoas.nome_completo,
+        email: vinculo.pessoas.email,
+        telefone: vinculo.pessoas.telefone,
+        foto_url: vinculo.pessoas.foto_url,
+        familia_id: vinculo.familia_id,
+        nome_familia: vinculo.familias.nome_familia
+      })) || [];
+
+      setPessoasComVinculosInconsistentes(pessoasInconsistentes);
+    } catch (error) {
+      console.error('Erro ao carregar pessoas com vínculos inconsistentes:', error);
+    }
+  };
+
+  const corrigirVinculoInconsistente = async (pessoaId: string, familiaId: string) => {
+    try {
+      // Atualizar a tabela pessoas para incluir o familia_id
+      const { error } = await supabase
+        .from('pessoas')
+        .update({ familia_id: familiaId })
+        .eq('id', pessoaId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Sucesso',
+        description: 'Vínculo corrigido com sucesso!',
+      });
+
+      // Recarregar dados
+      loadFamilias();
+      loadPessoasSemFamilia();
+      loadPessoasComVinculosInconsistentes();
+    } catch (error) {
+      console.error('Erro ao corrigir vínculo:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível corrigir o vínculo.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const criarNovaFamilia = async (nomeFamilia: string, pessoaId: string) => {
     try {
       // Verificar se a pessoa já está vinculada a uma família (tanto na tabela pessoas quanto vinculos_familiares)
@@ -130,26 +201,32 @@ const GestaoFamilias: React.FC = () => {
 
       if (pessoaError) throw pessoaError;
 
-      if (pessoaExistente.familia_id) {
+      // Verificar se já existe vínculo na tabela vinculos_familiares
+      const { data: vinculoExistente } = await supabase
+        .from('vinculos_familiares')
+        .select(`
+          id,
+          familia_id,
+          tipo_vinculo,
+          familias!inner(nome_familia)
+        `)
+        .eq('pessoa_id', pessoaId)
+        .single();
+
+      if (vinculoExistente) {
+        const nomeFamiliaExistente = (vinculoExistente.familias as any)?.nome_familia;
         toast({
           title: 'Aviso',
-          description: 'Esta pessoa já está vinculada a uma família.',
+          description: `Esta pessoa já está vinculada à família "${nomeFamiliaExistente}". Para criar uma nova família, primeiro remova o vínculo existente.`,
           variant: 'destructive',
         });
         return;
       }
 
-      // Verificar se já existe vínculo na tabela vinculos_familiares
-      const { data: vinculoExistente } = await supabase
-        .from('vinculos_familiares')
-        .select('id')
-        .eq('pessoa_id', pessoaId)
-        .single();
-
-      if (vinculoExistente) {
+      if (pessoaExistente.familia_id) {
         toast({
           title: 'Aviso',
-          description: 'Esta pessoa já possui vínculo familiar.',
+          description: 'Esta pessoa já está vinculada a uma família.',
           variant: 'destructive',
         });
         return;
@@ -192,6 +269,7 @@ const GestaoFamilias: React.FC = () => {
       // Recarregar dados
       loadFamilias();
       loadPessoasSemFamilia();
+      loadPessoasComVinculosInconsistentes();
       setIsDialogOpen(false);
     } catch (error) {
       console.error('Erro ao criar família:', error);
@@ -358,6 +436,47 @@ const GestaoFamilias: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pessoas com vínculos inconsistentes */}
+      {pessoasComVinculosInconsistentes.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-warning">
+              <Users className="h-5 w-5" />
+              Pessoas com Vínculos Inconsistentes ({pessoasComVinculosInconsistentes.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {pessoasComVinculosInconsistentes.map((pessoa) => (
+                <div key={pessoa.id} className="flex items-center justify-between p-3 border rounded-lg bg-warning/5">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={pessoa.foto_url} alt={pessoa.nome_completo} />
+                      <AvatarFallback className="bg-warning/10 text-warning">
+                        {pessoa.nome_completo.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{pessoa.nome_completo}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Vinculado à família: {pessoa.nome_familia}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => corrigirVinculoInconsistente(pessoa.id, pessoa.familia_id)}
+                  >
+                    Corrigir Vínculo
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Lista de famílias */}
       <div className="space-y-4">
