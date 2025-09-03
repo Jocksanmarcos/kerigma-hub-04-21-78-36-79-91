@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { 
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ import {
   UserPlus, 
   Calendar, 
   TrendingUp,
+  TrendingDown,
   Heart,
   MapPin,
   Clock,
@@ -32,10 +34,27 @@ import {
   Eye,
   MoreHorizontal,
   Plus,
-  UserCheck
+  UserCheck,
+  Activity,
+  AlertTriangle,
+  CheckCircle
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
 import { ModalAdicionarPessoa } from '@/components/missoes/modals/ModalAdicionarPessoa';
 import GestaoFamilias from '@/components/familias/GestaoFamilias';
 import MapaLocalizacao from '@/components/localizacao/MapaLocalizacao';
@@ -46,6 +65,10 @@ interface KPIData {
   aniversariantes: number;
   totalAtivos: number;
   engajamento: number;
+  crescimentoTendencia?: 'up' | 'down' | 'stable';
+  membrosPorFaixaEtaria?: { faixa: string; total: number }[];
+  distribuicaoPorCelula?: { nome: string; total: number }[];
+  historicoMensal?: { mes: string; membros: number; visitantes: number }[];
 }
 
 interface Pessoa {
@@ -482,43 +505,247 @@ interface AnalisesContentProps {
 }
 
 const AnalisesContent: React.FC<AnalisesContentProps> = ({ kpiData }) => {
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+  
+  const gerarInsights = () => {
+    const insights = [];
+    
+    // Insight sobre engajamento
+    if (kpiData.engajamento < 50) {
+      insights.push({
+        tipo: 'warning',
+        icon: AlertTriangle,
+        titulo: 'Baixo Engajamento',
+        descricao: `Apenas ${kpiData.engajamento}% dos membros estão em células. Recomendamos campanha de integração.`,
+        acao: 'Iniciar campanha de células'
+      });
+    } else if (kpiData.engajamento > 80) {
+      insights.push({
+        tipo: 'success',
+        icon: CheckCircle,
+        titulo: 'Excelente Engajamento',
+        descricao: `${kpiData.engajamento}% dos membros estão ativos em células. Parabéns!`,
+        acao: 'Manter estratégia atual'
+      });
+    }
+
+    // Insight sobre visitantes
+    if (kpiData.visitantes > 10) {
+      insights.push({
+        tipo: 'info',
+        icon: Users,
+        titulo: 'Oportunidade de Crescimento',
+        descricao: `${kpiData.visitantes} visitantes podem se tornar novos membros com acompanhamento adequado.`,
+        acao: 'Intensificar acompanhamento'
+      });
+    }
+
+    // Insight sobre crescimento
+    if (kpiData.novosMembros === 0) {
+      insights.push({
+        tipo: 'warning',
+        icon: TrendingDown,
+        titulo: 'Crescimento Estagnado',
+        descricao: 'Nenhum novo membro nos últimos 30 dias. Considere estratégias de evangelismo.',
+        acao: 'Planejar evangelismo'
+      });
+    } else if (kpiData.novosMembros > 5) {
+      insights.push({
+        tipo: 'success',
+        icon: TrendingUp,
+        titulo: 'Crescimento Acelerado',
+        descricao: `${kpiData.novosMembros} novos membros este mês! Excelente trabalho evangelístico.`,
+        acao: 'Preparar integração'
+      });
+    }
+
+    return insights;
+  };
+
+  const insights = gerarInsights();
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4">
-          <h3 className="font-semibold mb-2">Crescimento de Membros</h3>
-          <div className="text-2xl font-bold text-green-600">{kpiData.novosMembros}</div>
-          <p className="text-sm text-muted-foreground">Novos membros nos últimos 30 dias</p>
+      {/* Métricas Principais com Gráfico */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Crescimento Mensal
+          </h3>
+          {kpiData.historicoMensal && kpiData.historicoMensal.length > 0 ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={kpiData.historicoMensal}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="mes" />
+                <YAxis />
+                <Tooltip 
+                  labelClassName="text-foreground" 
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="membros" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2}
+                  name="Membros"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="visitantes" 
+                  stroke="#10b981" 
+                  strokeWidth={2}
+                  name="Visitantes"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-48 flex items-center justify-center text-muted-foreground">
+              Dados insuficientes para gráfico
+            </div>
+          )}
         </Card>
-        
-        <Card className="p-4">
-          <h3 className="font-semibold mb-2">Taxa de Engajamento</h3>
-          <div className="text-2xl font-bold text-blue-600">{kpiData.engajamento}%</div>
-          <p className="text-sm text-muted-foreground">Pessoas ativas em células</p>
+
+        <Card className="p-6">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Activity className="h-5 w-5 text-primary" />
+            Distribuição por Faixa Etária
+          </h3>
+          {kpiData.membrosPorFaixaEtaria && kpiData.membrosPorFaixaEtaria.length > 0 ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={kpiData.membrosPorFaixaEtaria}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="total"
+                  nameKey="faixa"
+                  label={({ faixa, value }) => `${faixa}: ${value}`}
+                >
+                  {kpiData.membrosPorFaixaEtaria.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-48 flex items-center justify-center text-muted-foreground">
+              Dados insuficientes para gráfico
+            </div>
+          )}
         </Card>
       </div>
 
-      <Card className="p-4">
-        <h3 className="font-semibold mb-4">Insights Importantes</h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm">
-            <Badge variant="secondary">Visitantes</Badge>
-            <span>{kpiData.visitantes} pessoas precisam de acompanhamento</span>
+      {/* Distribuição por Célula */}
+      <Card className="p-6">
+        <h3 className="font-semibold mb-4 flex items-center gap-2">
+          <Target className="h-5 w-5 text-primary" />
+          Membros por Célula
+        </h3>
+        {kpiData.distribuicaoPorCelula && kpiData.distribuicaoPorCelula.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={kpiData.distribuicaoPorCelula}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="nome" 
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                fontSize={12}
+              />
+              <YAxis />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+              />
+              <Bar dataKey="total" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-64 flex items-center justify-center text-muted-foreground">
+            Nenhuma célula encontrada
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Badge variant="secondary">Aniversários</Badge>
-            <span>{kpiData.aniversariantes} aniversariantes esta semana</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Badge variant={kpiData.engajamento > 70 ? 'default' : 'destructive'}>
-              Engajamento
-            </Badge>
-            <span>
-              {kpiData.engajamento > 70 ? 'Excelente' : 'Precisa melhorar'} nível de participação em células
-            </span>
-          </div>
+        )}
+      </Card>
+
+      {/* Insights Inteligentes */}
+      <Card className="p-6">
+        <h3 className="font-semibold mb-4 flex items-center gap-2">
+          <Activity className="h-5 w-5 text-primary" />
+          Insights Automáticos
+        </h3>
+        <div className="space-y-4">
+          {insights.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <CheckCircle className="mx-auto h-12 w-12 mb-4 text-green-500" />
+              <p>Tudo funcionando perfeitamente! Nenhuma ação requerida.</p>
+            </div>
+          ) : (
+            insights.map((insight, index) => {
+              const Icon = insight.icon;
+              const bgColor = insight.tipo === 'success' 
+                ? 'bg-green-50 border-green-200' 
+                : insight.tipo === 'warning' 
+                ? 'bg-yellow-50 border-yellow-200'
+                : 'bg-blue-50 border-blue-200';
+              
+              const iconColor = insight.tipo === 'success' 
+                ? 'text-green-600' 
+                : insight.tipo === 'warning' 
+                ? 'text-yellow-600'
+                : 'text-blue-600';
+
+              return (
+                <div key={index} className={`p-4 rounded-lg border ${bgColor}`}>
+                  <div className="flex items-start gap-3">
+                    <Icon className={`h-5 w-5 mt-0.5 ${iconColor}`} />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-foreground">{insight.titulo}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">{insight.descricao}</p>
+                      <Badge variant="outline" className="mt-2 text-xs">
+                        {insight.acao}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </Card>
+
+      {/* Resumo Estatístico */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4 text-center">
+          <div className="text-2xl font-bold text-green-600">{kpiData.totalAtivos}</div>
+          <p className="text-sm text-muted-foreground">Total de Membros Ativos</p>
+          <div className="mt-2">
+            <Progress value={100} className="h-2" />
+          </div>
+        </Card>
+        
+        <Card className="p-4 text-center">
+          <div className="text-2xl font-bold text-blue-600">{kpiData.visitantes}</div>
+          <p className="text-sm text-muted-foreground">Visitantes Ativos</p>
+          <div className="mt-2">
+            <Progress 
+              value={kpiData.totalAtivos ? (kpiData.visitantes / kpiData.totalAtivos) * 100 : 0} 
+              className="h-2" 
+            />
+          </div>
+        </Card>
+        
+        <Card className="p-4 text-center">
+          <div className="text-2xl font-bold text-purple-600">{kpiData.engajamento}%</div>
+          <p className="text-sm text-muted-foreground">Taxa de Engajamento</p>
+          <div className="mt-2">
+            <Progress value={kpiData.engajamento} className="h-2" />
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
@@ -712,7 +939,7 @@ const PessoasV2Page: React.FC = () => {
     try {
       setKpiLoading(true);
 
-      // Novos membros (últimos 30 dias) - usando data_membresia
+      // Novos membros (últimos 30 dias)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
@@ -735,8 +962,7 @@ const PessoasV2Page: React.FC = () => {
         .select('id', { count: 'exact', head: true })
         .eq('situacao', 'ativo');
 
-      // Aniversariantes desta semana - buscar pessoas com aniversário nos próximos 7 dias
-      const hoje = new Date();
+      // Aniversariantes desta semana
       const { data: todasPessoas } = await supabase
         .from('pessoas')
         .select('data_nascimento')
@@ -749,22 +975,18 @@ const PessoasV2Page: React.FC = () => {
         const dataNasc = new Date(pessoa.data_nascimento);
         const hoje = new Date();
         
-        // Calcular o próximo aniversário
         const proximoAniversario = new Date(hoje.getFullYear(), dataNasc.getMonth(), dataNasc.getDate());
-        
-        // Se já passou este ano, usar o próximo ano
         if (proximoAniversario < hoje) {
           proximoAniversario.setFullYear(hoje.getFullYear() + 1);
         }
         
-        // Calcular diferença em dias
         const diffTime = proximoAniversario.getTime() - hoje.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         return diffDays >= 0 && diffDays <= 7;
       }) || [];
 
-      // Calcular engajamento (pessoas ativas com células vs total)
+      // Calcular engajamento
       const { count: pessoasComCelula } = await supabase
         .from('pessoas')
         .select('id', { count: 'exact', head: true })
@@ -773,12 +995,83 @@ const PessoasV2Page: React.FC = () => {
 
       const engajamento = totalAtivos ? Math.round((pessoasComCelula / totalAtivos) * 100) : 0;
 
+      // Dados para análises avançadas
+      // 1. Distribuição por faixa etária
+      const { data: pessoasComIdade } = await supabase
+        .from('pessoas')
+        .select('data_nascimento')
+        .eq('situacao', 'ativo')
+        .not('data_nascimento', 'is', null);
+
+      const faixasEtarias = { '0-17': 0, '18-35': 0, '36-55': 0, '56+': 0 };
+      pessoasComIdade?.forEach(pessoa => {
+        if (pessoa.data_nascimento) {
+          const idade = new Date().getFullYear() - new Date(pessoa.data_nascimento).getFullYear();
+          if (idade <= 17) faixasEtarias['0-17']++;
+          else if (idade <= 35) faixasEtarias['18-35']++;
+          else if (idade <= 55) faixasEtarias['36-55']++;
+          else faixasEtarias['56+']++;
+        }
+      });
+
+      const membrosPorFaixaEtaria = Object.entries(faixasEtarias).map(([faixa, total]) => ({
+        faixa: faixa + ' anos',
+        total
+      }));
+
+      // 2. Distribuição por célula
+      const { data: celulasComMembros } = await supabase
+        .from('celulas')
+        .select(`
+          id, 
+          nome,
+          pessoas!pessoas_celula_id_fkey(id)
+        `)
+        .eq('ativa', true);
+
+      const distribuicaoPorCelula = celulasComMembros?.map(celula => ({
+        nome: celula.nome,
+        total: (celula.pessoas as any[])?.length || 0
+      })).sort((a, b) => b.total - a.total) || [];
+
+      // 3. Histórico mensal (últimos 6 meses)
+      const historicoMensal = [];
+      for (let i = 5; i >= 0; i--) {
+        const dataInicio = new Date();
+        dataInicio.setMonth(dataInicio.getMonth() - i, 1);
+        const dataFim = new Date(dataInicio);
+        dataFim.setMonth(dataFim.getMonth() + 1, 0);
+
+        const { count: membrosMes } = await supabase
+          .from('pessoas')
+          .select('id', { count: 'exact', head: true })
+          .lte('data_membresia', dataFim.toISOString().split('T')[0])
+          .eq('situacao', 'ativo')
+          .eq('tipo_pessoa', 'membro');
+
+        const { count: visitantesMes } = await supabase
+          .from('pessoas')  
+          .select('id', { count: 'exact', head: true })
+          .gte('created_at', dataInicio.toISOString())
+          .lte('created_at', dataFim.toISOString())
+          .eq('tipo_pessoa', 'visitante');
+
+        historicoMensal.push({
+          mes: dataInicio.toLocaleDateString('pt-BR', { month: 'short' }),
+          membros: membrosMes || 0,
+          visitantes: visitantesMes || 0
+        });
+      }
+
       setKpiData({
         novosMembros: novosMembros || 0,
         visitantes: visitantes || 0,
         aniversariantes: aniversariantesSemana.length,
         totalAtivos: totalAtivos || 0,
         engajamento,
+        membrosPorFaixaEtaria,
+        distribuicaoPorCelula,
+        historicoMensal
       });
 
     } catch (error) {
