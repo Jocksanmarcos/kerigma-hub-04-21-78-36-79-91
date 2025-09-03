@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar, Users, Clock, AlertCircle, Plus, FileText, PhoneCall, MessageSquare, User, CheckCircle2, X } from 'lucide-react';
 import { RelatorioSemanalDialog } from './RelatorioSemanalDialog';
+import { AddMemberDialog } from './AddMemberDialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -388,71 +389,7 @@ export const DashboardLiderCelulaEnhanced: React.FC = () => {
                 ))
               )}
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full mt-4" variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Membro
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Adicionar Novo Membro</DialogTitle>
-                  <DialogDescription>
-                    Adicione um novo membro à sua célula
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="grid gap-4">
-                    <div>
-                      <label className="text-sm font-medium">Nome Completo</label>
-                      <input 
-                        type="text" 
-                        className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                        placeholder="Digite o nome completo"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Telefone</label>
-                      <input 
-                        type="tel" 
-                        className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                        placeholder="(11) 99999-9999"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Email</label>
-                      <input 
-                        type="email" 
-                        className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                        placeholder="email@exemplo.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Data de Nascimento</label>
-                      <input 
-                        type="date" 
-                        className="w-full mt-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex space-x-2 pt-4">
-                    <Button 
-                      className="flex-1"
-                      onClick={() => {
-                        toast.success('Membro adicionado com sucesso!');
-                        // TODO: Implementar lógica de adicionar membro
-                      }}
-                    >
-                      Adicionar Membro
-                    </Button>
-                    <Button variant="outline" className="flex-1">
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <AddMemberDialog />
           </CardContent>
         </Card>
 
