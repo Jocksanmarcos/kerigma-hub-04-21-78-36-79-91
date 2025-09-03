@@ -77,9 +77,29 @@ export const CriarCelulaDialog: React.FC<CriarCelulaDialogProps> = ({
     p.papel_lideranca === 'lider_celula'
   ) || [];
 
-  const supervisores = pessoas?.filter(p => p.papel_lideranca === 'supervisor') || [];
-  const coordenadores = pessoas?.filter(p => p.papel_lideranca === 'coordenador') || [];
-  const pastoresRede = pessoas?.filter(p => p.papel_lideranca === 'pastor_rede') || [];
+  // Para supervisores, incluir pessoas que podem ser promovidas + supervisores existentes
+  const supervisores = pessoas?.filter(p => 
+    p.papel_lideranca === 'supervisor' || 
+    p.papel_lideranca === 'lider_celula' ||
+    (!p.papel_lideranca || p.papel_lideranca === 'membro')
+  ) || [];
+  
+  // Para coordenadores, incluir pessoas que podem ser promovidas + coordenadores existentes
+  const coordenadores = pessoas?.filter(p => 
+    p.papel_lideranca === 'coordenador' || 
+    p.papel_lideranca === 'supervisor' ||
+    p.papel_lideranca === 'lider_celula' ||
+    (!p.papel_lideranca || p.papel_lideranca === 'membro')
+  ) || [];
+  
+  // Para pastores de rede, incluir pessoas que podem ser promovidas + pastores existentes
+  const pastoresRede = pessoas?.filter(p => 
+    p.papel_lideranca === 'pastor_rede' || 
+    p.papel_lideranca === 'coordenador' ||
+    p.papel_lideranca === 'supervisor' ||
+    p.papel_lideranca === 'lider_celula' ||
+    (!p.papel_lideranca || p.papel_lideranca === 'membro')
+  ) || [];
 
   const handleSubmit = async () => {
     if (!formData.nome || !formData.lider_id) {
