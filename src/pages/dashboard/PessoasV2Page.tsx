@@ -29,10 +29,12 @@ import {
   Mail,
   MessageCircle,
   Eye,
-  MoreHorizontal
+  MoreHorizontal,
+  Plus
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ModalAdicionarPessoa } from '@/components/missoes/modals/ModalAdicionarPessoa';
 
 interface KPIData {
   novosMembros: number;
@@ -391,6 +393,7 @@ const PessoasV2Page: React.FC = () => {
   const [listaDePessoas, setListaDePessoas] = useState<Pessoa[]>([]);
   const [celulas, setCelulas] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
 
   const [kpiData, setKpiData] = useState<KPIData>({
@@ -527,6 +530,18 @@ const PessoasV2Page: React.FC = () => {
 
   // Filtered results count
   const totalResultados = listaDePessoas.length;
+
+  const handleAddPerson = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleModalSuccess = () => {
+    fetchPessoas(); // Recarregar lista
+  };
 
   const loadKPIData = async () => {
     try {
@@ -758,21 +773,32 @@ const PessoasV2Page: React.FC = () => {
                 
                 <div className="flex items-center gap-2">
                   <Button
-                    variant={viewMode === 'lista' ? 'default' : 'outline'}
+                    onClick={handleAddPerson}
                     size="sm"
-                    onClick={() => setViewMode('lista')}
-                    className="px-3"
+                    className="gap-2"
                   >
-                    <List className="h-4 w-4" />
+                    <Plus className="h-4 w-4" />
+                    Adicionar Nova Pessoa
                   </Button>
-                  <Button
-                    variant={viewMode === 'cards' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setViewMode('cards')}
-                    className="px-3"
-                  >
-                    <Grid3X3 className="h-4 w-4" />
-                  </Button>
+                  
+                  <div className="flex gap-1">
+                    <Button
+                      variant={viewMode === 'lista' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('lista')}
+                      className="px-3"
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'cards' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('cards')}
+                      className="px-3"
+                    >
+                      <Grid3X3 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -839,6 +865,13 @@ const PessoasV2Page: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de Adicionar Pessoa */}
+      <ModalAdicionarPessoa
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
+      />
     </AppLayout>
   );
 };
