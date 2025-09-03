@@ -21,7 +21,6 @@ import {
 import { Heart, Plus, Users, Search, Link, Unlink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useFamiliaBidirecional } from '@/hooks/useFamiliaBidirecional';
 
 interface Familia {
   id: string;
@@ -131,6 +130,75 @@ const GestaoFamilias: React.FC = () => {
     }
   };
 
+  const consolidarFamiliasDuplicadas = async () => {
+    try {
+      // Buscar famílias duplicadas
+      const { data: familias, error } = await supabase
+        .from('familias')
+        .select('*')
+        .order('created_at');
+
+      if (error) throw error;
+
+      // Agrupar por nome
+      const familiasAgrupadas = familias?.reduce((acc: any, familia: any) => {
+        if (!acc[familia.nome_familia]) {
+          acc[familia.nome_familia] = [];
+        }
+        acc[familia.nome_familia].push(familia);
+        return acc;
+      }, {});
+
+      // Consolidar duplicadas
+      for (const nomeFamilia in familiasAgrupadas) {
+        const familiasComMesmoNome = familiasAgrupadas[nomeFamilia];
+        
+        if (familiasComMesmoNome.length > 1) {
+          const familiaOriginal = familiasComMesmoNome[0]; // A mais antiga
+          const familiasDuplicadas = familiasComMesmoNome.slice(1);
+
+          // Mover todos os vínculos para a família original
+          for (const familiaDuplicada of familiasDuplicadas) {
+            // Atualizar vínculos_familiares
+            await supabase
+              .from('vinculos_familiares')
+              .update({ familia_id: familiaOriginal.id })
+              .eq('familia_id', familiaDuplicada.id);
+
+            // Atualizar pessoas
+            await supabase
+              .from('pessoas')
+              .update({ familia_id: familiaOriginal.id })
+              .eq('familia_id', familiaDuplicada.id);
+
+            // Remover família duplicada
+            await supabase
+              .from('familias')
+              .delete()
+              .eq('id', familiaDuplicada.id);
+          }
+        }
+      }
+
+      toast({
+        title: 'Sucesso',
+        description: 'Famílias duplicadas consolidadas!',
+      });
+
+      // Recarregar dados
+      loadFamilias();
+      loadPessoasSemFamilia();
+      loadPessoasComVinculosInconsistentes();
+    } catch (error) {
+      console.error('Erro ao consolidar famílias:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao consolidar famílias duplicadas.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const loadPessoasComVinculosInconsistentes = async () => {
     try {
       const { data, error } = await supabase
@@ -192,7 +260,36 @@ const GestaoFamilias: React.FC = () => {
 
   const criarNovaFamilia = async (nomeFamilia: string, pessoaId: string) => {
     try {
-      // Verificar se a pessoa já está vinculada a uma família (tanto na tabela pessoas quanto vinculos_familiares)
+      // Verificar se já existe uma família com este nome
+      const { data: familiaExistente } = await supabase
+        .from('familias')
+        .select('id, nome_familia')
+        .eq('nome_familia', nomeFamilia)
+        .single();
+
+      let familiaId: string;
+
+      if (familiaExistente) {
+        // Se já existe, usar a família existente
+        familiaId = familiaExistente.id;
+        
+        toast({
+          title: 'Informação',
+          description: `Família "${nomeFamilia}" já existe. Vinculando à família existente.`,
+        });
+      } else {
+        // Se não existe, criar nova família
+        const { data: novaFamilia, error: familiaError } = await supabase
+          .from('familias')
+          .insert({ nome_familia: nomeFamilia })
+          .select()
+          .single();
+
+        if (familiaError) throw familiaError;
+        familiaId = novaFamilia.id;
+      }
+
+      // Verificar se a pessoa já está vinculada
       const { data: pessoaExistente, error: pessoaError } = await supabase
         .from('pessoas')
         .select('familia_id')
@@ -201,23 +298,16 @@ const GestaoFamilias: React.FC = () => {
 
       if (pessoaError) throw pessoaError;
 
-      // Verificar se já existe vínculo na tabela vinculos_familiares
       const { data: vinculoExistente } = await supabase
         .from('vinculos_familiares')
-        .select(`
-          id,
-          familia_id,
-          tipo_vinculo,
-          familias!inner(nome_familia)
-        `)
+        .select('id, familia_id')
         .eq('pessoa_id', pessoaId)
         .single();
 
       if (vinculoExistente) {
-        const nomeFamiliaExistente = (vinculoExistente.familias as any)?.nome_familia;
         toast({
           title: 'Aviso',
-          description: `Esta pessoa já está vinculada à família "${nomeFamiliaExistente}". Para criar uma nova família, primeiro remova o vínculo existente.`,
+          description: 'Esta pessoa já possui vínculo familiar.',
           variant: 'destructive',
         });
         return;
@@ -232,19 +322,10 @@ const GestaoFamilias: React.FC = () => {
         return;
       }
 
-      // Criar família
-      const { data: novaFamilia, error: familiaError } = await supabase
-        .from('familias')
-        .insert({ nome_familia: nomeFamilia })
-        .select()
-        .single();
-
-      if (familiaError) throw familiaError;
-
-      // Vincular pessoa à família na tabela pessoas
+      // Vincular pessoa à família
       const { error: updateError } = await supabase
         .from('pessoas')
-        .update({ familia_id: novaFamilia.id })
+        .update({ familia_id: familiaId })
         .eq('id', pessoaId);
 
       if (updateError) throw updateError;
@@ -253,7 +334,7 @@ const GestaoFamilias: React.FC = () => {
       const { error: vinculoError } = await supabase
         .from('vinculos_familiares')
         .insert({
-          familia_id: novaFamilia.id,
+          familia_id: familiaId,
           pessoa_id: pessoaId,
           tipo_vinculo: 'responsavel',
           responsavel_familiar: true
@@ -436,23 +517,32 @@ const GestaoFamilias: React.FC = () => {
           </div>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Família
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Criar Nova Família</DialogTitle>
-            </DialogHeader>
-            <NovaFamiliaForm 
-              pessoasSemFamilia={pessoasSemFamilia}
-              onSubmit={criarNovaFamilia}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={consolidarFamiliasDuplicadas}
+          >
+            Consolidar Duplicadas
+          </Button>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Família
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Criar Nova Família</DialogTitle>
+              </DialogHeader>
+              <NovaFamiliaForm 
+                pessoasSemFamilia={pessoasSemFamilia}
+                onSubmit={criarNovaFamilia}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Seção de vinculação rápida */}
