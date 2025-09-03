@@ -43,13 +43,13 @@ export const useChatbotSupport = () => {
     ];
 
     const pastorSuggestions = [
-      'Como cadastrar uma nova pessoa?',
       'Como fazer lançamentos financeiros?',
       'Como usar a IA Pastoral?',
       'Como configurar permissões?',
       'Como gerar relatórios detalhados?',
       'Como gerenciar patrimônio?',
-      'Como exportar dados?'
+      'Como exportar dados?',
+      'Como gerenciar células?'
     ];
 
     switch (userRole) {
@@ -155,18 +155,9 @@ export const useChatbotSupport = () => {
     
     if (questionLower.includes('pessoa') || questionLower.includes('cadastr')) {
       if (userRole === 'pastor') {
-        return getRoleBasedResponse(`Para cadastrar uma nova pessoa:
-
-1. Acesse o menu "Pessoas" no painel lateral
-2. Clique no botão "Nova Pessoa" (+)
-3. Preencha os dados obrigatórios: Nome, Email, Telefone
-4. Defina o tipo de pessoa (Membro, Visitante, etc.)
-5. Adicione informações complementares se necessário
-6. Clique em "Salvar"
-
-💡 **Dica:** Use a importação em massa para adicionar várias pessoas de uma vez!`);
+        return getRoleBasedResponse(`O sistema de gestão de pessoas foi removido. Para gerenciar membros, utilize outros módulos disponíveis como Células, Eventos ou contate o suporte técnico para alternativas.`);
       } else {
-        return getRoleBasedResponse(`Esta funcionalidade está disponível apenas para pastores. Entre em contato com a liderança para cadastrar novas pessoas na plataforma.`);
+        return getRoleBasedResponse(`O sistema de gestão de pessoas foi removido. Entre em contato com a liderança para gerenciar membros através de outros módulos disponíveis.`);
       }
     }
     
@@ -245,7 +236,7 @@ export const useChatbotSupport = () => {
         case 'pastor':
           return `Obrigado pela sua pergunta! Como Pastor, posso ajudar com:
 
-🔹 **Pessoas** - Cadastros e gerenciamento
+🔹 **Membros** - Dados via outros módulos
 🔹 **Células** - Criação e supervisão
 🔹 **Financeiro** - Dízimos, ofertas, despesas
 🔹 **Relatórios** - Análises completas

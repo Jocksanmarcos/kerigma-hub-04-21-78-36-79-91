@@ -37,14 +37,7 @@ const siteLinks = [
       { name: 'Admin (Legacy)', url: '/admin', icon: Settings },
     ]
   },
-  {
-    title: 'Gestão de Pessoas',
-    description: 'Módulo para gerenciar membros e visitantes',
-    icon: Users,
-    links: [
-      { name: 'Pessoas', url: '/dashboard/pessoas', icon: Users },
-    ]
-  },
+  // People management section removed
   {
     title: 'Centro de Ensino',
     description: 'Sistema de educação e discipulado',

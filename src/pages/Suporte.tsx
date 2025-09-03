@@ -52,7 +52,7 @@ export default function Suporte() {
     },
     {
       pergunta: 'Como gerenciar permissões dos líderes de ministério?',
-      resposta: 'No menu "Pessoas", selecione o líder desejado, clique em "Editar" e defina seu papel. Cada papel tem permissões específicas para seus ministérios (células, financeiro, eventos, etc.).',
+      resposta: 'Acesse o painel de Governança no menu Administração para gerenciar perfis e permissões dos líderes. Cada papel tem permissões específicas para seus ministérios (células, financeiro, eventos, etc.).',
       categoria: 'usuarios',
       perfis: ['pastor']
     },

@@ -5,7 +5,7 @@ import { PageLoader } from './PageLoader';
 // Lazy load heavy components
 export const LazyDashboard = lazy(() => import('@/pages/dashboard/DashboardPage'));
 export const LazyFinanceiro = lazy(() => import('@/pages/dashboard/FinanceiroPage'));
-export const LazyPessoas = lazy(() => import('@/pages/dashboard/PessoasPage'));
+// export const LazyPessoas = lazy(() => import('@/pages/dashboard/PessoasPage')); // Removed
 export const LazyEventos = lazy(() => import('@/pages/dashboard/EventosPage'));
 export const LazyEnsino = lazy(() => import('@/pages/ensino/CentroEnsinoPage'));
 export const LazyAgenda = lazy(() => import('@/pages/dashboard/AgendaPage'));

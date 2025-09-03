@@ -8,10 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 // Lazy load pages for better performance
 const Index = React.lazy(() => import("@/pages/Index"));
 const DashboardPage = React.lazy(() => import("@/pages/dashboard/DashboardPage"));
-const PessoasPage = React.lazy(() => import("@/pages/dashboard/PessoasPage"));
-const PessoaDetailPage = React.lazy(() => import("@/pages/dashboard/PessoaDetailPage"));
-const PessoasV2Page = React.lazy(() => import("@/pages/dashboard/PessoasV2Page"));
-const PessoasRefactoredPage = React.lazy(() => import("@/pages/dashboard/PessoasRefactoredPage"));
+// People management pages removed
 const FinanceiroPage = React.lazy(() => import("@/pages/dashboard/FinanceiroPage"));
 const AgendaPage = React.lazy(() => import("@/pages/dashboard/AgendaPage"));
 const EventosPage = React.lazy(() => import("@/pages/dashboard/EventosPage"));
@@ -123,10 +120,7 @@ export const AppRouter: React.FC = () => {
         <Route path="/admin" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         
-        <Route path="/dashboard/pessoas" element={<ProtectedRoute><PessoasPage /></ProtectedRoute>} />
-        <Route path="/pessoas-v2" element={<ProtectedRoute><PessoasV2Page /></ProtectedRoute>} />
-        <Route path="/pessoas-refactored" element={<ProtectedRoute><PessoasRefactoredPage /></ProtectedRoute>} />
-        <Route path="/dashboard/pessoas/:id" element={<ProtectedRoute><PessoaDetailPage /></ProtectedRoute>} />
+        {/* People management routes removed */}
         <Route path="/dashboard/biblioteca" element={<ProtectedRoute>{React.createElement(React.lazy(() => import("@/pages/dashboard/BibliotecaPage")))}</ProtectedRoute>} />
         <Route path="/dashboard/celulas" element={<ProtectedRoute><CelulasPage /></ProtectedRoute>} />
         <Route path="/dashboard/aconselhamento" element={<ProtectedRoute><AconselhamentoPage /></ProtectedRoute>} />
@@ -141,7 +135,7 @@ export const AppRouter: React.FC = () => {
         <Route path="/dashboard/missoes" element={<ProtectedRoute><MissoesPage /></ProtectedRoute>} />
         <Route path="/dashboard/missoes/financeiro" element={<ProtectedRoute><MissoesFinanceiroPage /></ProtectedRoute>} />
         <Route path="/dashboard/missoes/relatorios" element={<ProtectedRoute>{React.createElement(React.lazy(() => import("@/pages/Dashboard/MissoesRelatorios")))}</ProtectedRoute>} />
-        <Route path="/dashboard/missoes/pessoas" element={<ProtectedRoute>{React.createElement(React.lazy(() => import("@/pages/Dashboard/MissoesPessoas")))}</ProtectedRoute>} />
+        {/* Missoes pessoas route removed */}
         <Route path="/dashboard/missoes/eventos" element={<ProtectedRoute>{React.createElement(React.lazy(() => import("@/pages/Dashboard/MissoesEventos")))}</ProtectedRoute>} />
         <Route path="/dashboard/missoes/configuracoes" element={<ProtectedRoute>{React.createElement(React.lazy(() => import("@/pages/Dashboard/MissoesConfiguracoes")))}</ProtectedRoute>} />
 

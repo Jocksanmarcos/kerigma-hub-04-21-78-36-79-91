@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useCreatePessoa, useMissoesPessoas } from '@/hooks/useMissoesPessoas';
+// import { useCreatePessoa, useMissoesPessoas } from '@/hooks/useMissoesPessoas'; // Removed - People management deleted
 import { useChurches } from '@/hooks/useChurches';
 import { User, Mail, Phone, MapPin, Building2, Users } from 'lucide-react';
 
@@ -32,8 +32,15 @@ export const ModalCadastrarPessoa: React.FC<ModalCadastrarPessoaProps> = ({
   });
 
   const { data: churches = [] } = useChurches();
-  const { data: pessoas = [] } = useMissoesPessoas();
-  const createPessoa = useCreatePessoa();
+  // People management functionality removed
+  const pessoas: any[] = [];
+  
+  const createPessoa = {
+    mutateAsync: async (data: any) => {
+      throw new Error('People management has been removed from the system');
+    },
+    isPending: false
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

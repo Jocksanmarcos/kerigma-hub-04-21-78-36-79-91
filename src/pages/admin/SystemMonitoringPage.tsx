@@ -206,7 +206,7 @@ export default function SystemMonitoringPage() {
                       <p><strong>Autenticação:</strong> Bearer Token (Supabase)</p>
                       <p><strong>Endpoints principais:</strong></p>
                       <ul className="ml-4 space-y-1">
-                        <li>• /pessoas - Gestão de membros</li>
+                        <li>• /membros - Dados de membros (via outros módulos)</li>
                         <li>• /eventos - Gestão de eventos</li>
                         <li>• /financeiro - Gestão financeira</li>
                         <li>• /ensino - Gestão de ensino</li>
