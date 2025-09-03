@@ -75,6 +75,8 @@ export const GerenciarLideresDialog: React.FC = () => {
   };
 
   const handleDesignarLider = async () => {
+    console.log('Designando líder:', { selectedCelula, selectedPessoa });
+    
     if (!selectedCelula || !selectedPessoa) {
       toast({
         title: "Campos obrigatórios",
@@ -86,12 +88,20 @@ export const GerenciarLideresDialog: React.FC = () => {
 
     try {
       setLoading(true);
-      const { error } = await supabase
+      console.log('Enviando update para Supabase...');
+      
+      const { error, data } = await supabase
         .from('celulas')
         .update({ lider_id: selectedPessoa })
-        .eq('id', selectedCelula);
+        .eq('id', selectedCelula)
+        .select();
 
-      if (error) throw error;
+      console.log('Resposta do Supabase:', { error, data });
+
+      if (error) {
+        console.error('Erro na atualização:', error);
+        throw error;
+      }
 
       toast({
         title: "Líder designado!",
@@ -105,7 +115,7 @@ export const GerenciarLideresDialog: React.FC = () => {
       console.error('Erro ao designar líder:', error);
       toast({
         title: "Erro",
-        description: "Erro ao designar líder da célula.",
+        description: `Erro ao designar líder da célula: ${error.message}`,
         variant: "destructive",
       });
     } finally {
