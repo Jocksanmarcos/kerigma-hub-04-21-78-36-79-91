@@ -43,7 +43,7 @@ const principalNavItems = [
 
 // Pessoas & Grupos
 const pessoasGruposNavItems = [
-  { title: 'Pessoas', url: '/dashboard/pessoas', icon: Users, page: 'pessoas', roles: ['pastor'] },
+  { title: 'Pessoas v2', url: '/pessoas-v2', icon: Users, page: 'pessoas-v2', roles: ['pastor'] },
   { title: 'Células', url: '/dashboard/celulas', icon: HeartHandshake, page: 'celulas', roles: ['pastor', 'lider'] },
   { title: 'Ministérios', url: '/dashboard/ministerios', icon: Music, page: 'ministerios', roles: ['pastor', 'lider'] },
   { title: 'Busca de Talentos', url: '/admin/busca-voluntarios', icon: Search, page: 'busca-voluntarios', roles: ['pastor', 'lider'] },
