@@ -295,19 +295,51 @@ const GestaoFamilias: React.FC = () => {
       // Verificar se já existe vínculo na tabela vinculos_familiares
       const { data: vinculoExistente } = await supabase
         .from('vinculos_familiares')
-        .select('id')
+        .select(`
+          id,
+          familia_id,
+          tipo_vinculo,
+          familias!inner(nome_familia)
+        `)
         .eq('pessoa_id', selectedPessoa)
         .single();
 
       if (vinculoExistente) {
-        toast({
-          title: 'Aviso',
-          description: 'Esta pessoa já possui vínculo familiar.',
-          variant: 'destructive',
-        });
-        return;
+        const familiaVinculada = (vinculoExistente.familias as any)?.nome_familia;
+        
+        // Se está tentando vincular à mesma família que já está vinculada, apenas corrigir a inconsistência
+        if (vinculoExistente.familia_id === selectedFamilia) {
+          const { error: updateError } = await supabase
+            .from('pessoas')
+            .update({ familia_id: selectedFamilia })
+            .eq('id', selectedPessoa);
+
+          if (updateError) throw updateError;
+
+          toast({
+            title: 'Sucesso',
+            description: 'Vínculo corrigido com sucesso!',
+          });
+
+          // Recarregar dados
+          loadFamilias();
+          loadPessoasSemFamilia();
+          loadPessoasComVinculosInconsistentes();
+          setSelectedPessoa('');
+          setSelectedFamilia('');
+          return;
+        } else {
+          // Se está tentando vincular a uma família diferente
+          toast({
+            title: 'Aviso',
+            description: `Esta pessoa já está vinculada à família "${familiaVinculada}". Para trocar de família, primeiro remova o vínculo existente.`,
+            variant: 'destructive',
+          });
+          return;
+        }
       }
 
+      // Se não há vínculo existente, criar novo vínculo
       // Atualizar na tabela pessoas
       const { error: updateError } = await supabase
         .from('pessoas')
