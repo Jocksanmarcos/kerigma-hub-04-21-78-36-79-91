@@ -10856,30 +10856,42 @@ export type Database = {
       }
       vinculos_familiares: {
         Row: {
+          confirmado: boolean | null
           created_at: string
+          data_confirmacao: string | null
           familia_id: string
           id: string
+          observacoes_parentesco: string | null
           pessoa_id: string
+          pessoa_relacionada_id: string | null
           responsavel_familiar: boolean
-          tipo_vinculo: string
+          tipo_vinculo: Database["public"]["Enums"]["tipo_parentesco"]
           updated_at: string
         }
         Insert: {
+          confirmado?: boolean | null
           created_at?: string
+          data_confirmacao?: string | null
           familia_id: string
           id?: string
+          observacoes_parentesco?: string | null
           pessoa_id: string
+          pessoa_relacionada_id?: string | null
           responsavel_familiar?: boolean
-          tipo_vinculo?: string
+          tipo_vinculo?: Database["public"]["Enums"]["tipo_parentesco"]
           updated_at?: string
         }
         Update: {
+          confirmado?: boolean | null
           created_at?: string
+          data_confirmacao?: string | null
           familia_id?: string
           id?: string
+          observacoes_parentesco?: string | null
           pessoa_id?: string
+          pessoa_relacionada_id?: string | null
           responsavel_familiar?: boolean
-          tipo_vinculo?: string
+          tipo_vinculo?: Database["public"]["Enums"]["tipo_parentesco"]
           updated_at?: string
         }
         Relationships: [
@@ -10894,6 +10906,13 @@ export type Database = {
             foreignKeyName: "vinculos_familiares_pessoa_id_fkey"
             columns: ["pessoa_id"]
             isOneToOne: true
+            referencedRelation: "pessoas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vinculos_familiares_pessoa_relacionada_id_fkey"
+            columns: ["pessoa_relacionada_id"]
+            isOneToOne: false
             referencedRelation: "pessoas"
             referencedColumns: ["id"]
           },
@@ -11883,6 +11902,36 @@ export type Database = {
         | "reuniao_interna"
         | "pastoral"
       tipo_midia: "imagem" | "video"
+      tipo_parentesco:
+        | "pai"
+        | "mae"
+        | "filho"
+        | "filha"
+        | "irmao"
+        | "irma"
+        | "avo"
+        | "ava"
+        | "neto"
+        | "neta"
+        | "tio"
+        | "tia"
+        | "sobrinho"
+        | "sobrinha"
+        | "primo"
+        | "prima"
+        | "genro"
+        | "nora"
+        | "sogro"
+        | "sogra"
+        | "cunhado"
+        | "cunhada"
+        | "padrasto"
+        | "madrasta"
+        | "enteado"
+        | "enteada"
+        | "responsavel"
+        | "membro"
+        | "outro"
       tipo_responsabilidade_enum:
         | "pai_biologico"
         | "mae_biologica"
@@ -12124,6 +12173,37 @@ export const Constants = {
         "pastoral",
       ],
       tipo_midia: ["imagem", "video"],
+      tipo_parentesco: [
+        "pai",
+        "mae",
+        "filho",
+        "filha",
+        "irmao",
+        "irma",
+        "avo",
+        "ava",
+        "neto",
+        "neta",
+        "tio",
+        "tia",
+        "sobrinho",
+        "sobrinha",
+        "primo",
+        "prima",
+        "genro",
+        "nora",
+        "sogro",
+        "sogra",
+        "cunhado",
+        "cunhada",
+        "padrasto",
+        "madrasta",
+        "enteado",
+        "enteada",
+        "responsavel",
+        "membro",
+        "outro",
+      ],
       tipo_responsabilidade_enum: [
         "pai_biologico",
         "mae_biologica",

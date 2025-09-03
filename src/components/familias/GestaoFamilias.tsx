@@ -18,9 +18,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Heart, Plus, Users, Search, Link, Unlink } from 'lucide-react';
+import { Heart, Plus, Users, Search, Link, Unlink, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import GerenciarParentescos from './GerenciarParentescos';
 
 interface Familia {
   id: string;
@@ -59,6 +60,17 @@ const GestaoFamilias: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [parentescosModal, setParentescosModal] = useState<{
+    isOpen: boolean;
+    pessoaId: string;
+    nomePessoa: string;
+    familiaId: string;
+  }>({
+    isOpen: false,
+    pessoaId: '',
+    nomePessoa: '',
+    familiaId: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -715,6 +727,14 @@ const GestaoFamilias: React.FC = () => {
                 key={familia.id}
                 familia={familia}
                 onDesvincular={desvincularPessoa}
+                onGerenciarParentescos={(pessoaId, nomePessoa, familiaId) => 
+                  setParentescosModal({
+                    isOpen: true,
+                    pessoaId,
+                    nomePessoa,
+                    familiaId
+                  })
+                }
               />
             ))
         )}
@@ -749,6 +769,22 @@ const GestaoFamilias: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Modal para gerenciar parentescos */}
+      <Dialog open={parentescosModal.isOpen} onOpenChange={(open) => 
+        setParentescosModal(prev => ({ ...prev, isOpen: open }))
+      }>
+        <DialogContent className="max-w-5xl">
+          {parentescosModal.isOpen && (
+            <GerenciarParentescos
+              pessoaId={parentescosModal.pessoaId}
+              nomePessoa={parentescosModal.nomePessoa}
+              familiaId={parentescosModal.familiaId}
+              onClose={() => setParentescosModal(prev => ({ ...prev, isOpen: false }))}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -757,9 +793,10 @@ const GestaoFamilias: React.FC = () => {
 interface FamiliaCardProps {
   familia: Familia;
   onDesvincular: (pessoaId: string) => void;
+  onGerenciarParentescos: (pessoaId: string, nomePessoa: string, familiaId: string) => void;
 }
 
-const FamiliaCard: React.FC<FamiliaCardProps> = ({ familia, onDesvincular }) => {
+const FamiliaCard: React.FC<FamiliaCardProps> = ({ familia, onDesvincular, onGerenciarParentescos }) => {
   return (
     <Card>
       <CardHeader>
@@ -794,14 +831,25 @@ const FamiliaCard: React.FC<FamiliaCardProps> = ({ familia, onDesvincular }) => 
                     <p className="text-sm text-muted-foreground">{membro.email}</p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDesvincular(membro.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Unlink className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onGerenciarParentescos(membro.id, membro.nome_completo, familia.id)}
+                    title="Gerenciar Parentescos"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDesvincular(membro.id)}
+                    className="text-destructive hover:text-destructive"
+                    title="Desvincular da família"
+                  >
+                    <Unlink className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
