@@ -10,7 +10,7 @@ import { BibliotecaRecursos } from './BibliotecaRecursos';
 import { GestaoVisitantesEnhanced } from './GestaoVisitantesEnhanced';
 import { usePapelLideranca } from '@/hooks/usePapelLideranca';
 import { useCurrentPerson } from '@/hooks/useCurrentPerson';
-import { GerenciarLideresDialog } from './GerenciarLideresDialog';
+
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -172,10 +172,6 @@ export const CentroComandoCelulas: React.FC = () => {
         </Card>
       </div>
 
-      {/* Ações Administrativas */}
-      <div className="flex justify-end">
-        <GerenciarLideresDialog />
-      </div>
 
       {/* Main Interface */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
