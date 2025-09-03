@@ -198,21 +198,52 @@ const handlePhoneCall = (telefone: string, nome: string) => {
   toast.info(`Ligando para ${nome}`);
 };
 
-const handleConfirmarReuniao = () => {
-  toast.success('Reunião confirmada! Notificações enviadas aos membros');
+const handleConfirmarReuniao = async () => {
+  try {
+    // Aqui você pode implementar a lógica para marcar a reunião como confirmada no banco
+    // Por exemplo, atualizar o status da próxima reunião
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('Usuário não autenticado');
+      return;
+    }
+
+    // Simular atualização no banco de dados
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast.success('Reunião confirmada! Notificações serão enviadas aos membros');
+  } catch (error) {
+    console.error('Erro ao confirmar reunião:', error);
+    toast.error('Erro ao confirmar reunião');
+  }
 };
 
-const handleEnviarLembreteGeral = (membros: MembroCelula[]) => {
-  let contadorEnviado = 0;
-  membros.forEach(membro => {
-    if (membro.telefone) {
+const handleEnviarLembreteGeral = async (membros: MembroCelula[]) => {
+  if (!membros || membros.length === 0) {
+    toast.error('Nenhum membro disponível para enviar lembrete');
+    return;
+  }
+
+  const membrosComTelefone = membros.filter(m => m.telefone);
+  
+  if (membrosComTelefone.length === 0) {
+    toast.error('Nenhum membro possui telefone cadastrado');
+    return;
+  }
+
+  try {
+    // Abrir WhatsApp para cada membro com delay
+    membrosComTelefone.forEach((membro, index) => {
       setTimeout(() => {
         handleWhatsAppContact(membro.telefone, membro.nome_completo);
-        contadorEnviado++;
-      }, contadorEnviado * 500); // Delay entre mensagens
-    }
-  });
-  toast.success(`Enviando lembretes para ${membros.filter(m => m.telefone).length} membros`);
+      }, index * 1000); // 1 segundo de delay entre cada contato
+    });
+    
+    toast.success(`Abrindo WhatsApp para ${membrosComTelefone.length} membros`);
+  } catch (error) {
+    console.error('Erro ao enviar lembretes:', error);
+    toast.error('Erro ao enviar lembretes');
+  }
 };
 
 export const DashboardLiderCelulaEnhanced: React.FC = () => {
