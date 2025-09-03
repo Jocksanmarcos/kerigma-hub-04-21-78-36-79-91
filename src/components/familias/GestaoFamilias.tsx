@@ -383,7 +383,7 @@ const GestaoFamilias: React.FC = () => {
           familias!inner(nome_familia)
         `)
         .eq('pessoa_id', selectedPessoa)
-        .single();
+        .maybeSingle();
 
       if (vinculoExistente) {
         const familiaVinculada = (vinculoExistente.familias as any)?.nome_familia;
@@ -410,12 +410,32 @@ const GestaoFamilias: React.FC = () => {
           setSelectedFamilia('');
           return;
         } else {
-          // Se está tentando vincular a uma família diferente
+          // Se está tentando vincular a uma família diferente, atualizar o vínculo
+          const { error: updateVinculoError } = await supabase
+            .from('vinculos_familiares')
+            .update({ familia_id: selectedFamilia })
+            .eq('pessoa_id', selectedPessoa);
+
+          if (updateVinculoError) throw updateVinculoError;
+
+          const { error: updatePessoaError } = await supabase
+            .from('pessoas')
+            .update({ familia_id: selectedFamilia })
+            .eq('id', selectedPessoa);
+
+          if (updatePessoaError) throw updatePessoaError;
+
           toast({
-            title: 'Aviso',
-            description: `Esta pessoa já está vinculada à família "${familiaVinculada}". Para trocar de família, primeiro remova o vínculo existente.`,
-            variant: 'destructive',
+            title: 'Sucesso',
+            description: 'Pessoa transferida para nova família com sucesso!',
           });
+
+          // Recarregar dados
+          loadFamilias();
+          loadPessoasSemFamilia();
+          loadPessoasComVinculosInconsistentes();
+          setSelectedPessoa('');
+          setSelectedFamilia('');
           return;
         }
       }
@@ -464,12 +484,21 @@ const GestaoFamilias: React.FC = () => {
 
   const desvincularPessoa = async (pessoaId: string) => {
     try {
-      const { error } = await supabase
+      // Remover vínculo da tabela vinculos_familiares
+      const { error: vinculoError } = await supabase
+        .from('vinculos_familiares')
+        .delete()
+        .eq('pessoa_id', pessoaId);
+
+      if (vinculoError) throw vinculoError;
+
+      // Atualizar na tabela pessoas
+      const { error: pessoaError } = await supabase
         .from('pessoas')
         .update({ familia_id: null })
         .eq('id', pessoaId);
 
-      if (error) throw error;
+      if (pessoaError) throw pessoaError;
 
       toast({
         title: 'Sucesso',
@@ -479,6 +508,7 @@ const GestaoFamilias: React.FC = () => {
       // Recarregar dados
       loadFamilias();
       loadPessoasSemFamilia();
+      loadPessoasComVinculosInconsistentes();
     } catch (error) {
       console.error('Erro ao desvincular pessoa:', error);
       toast({
