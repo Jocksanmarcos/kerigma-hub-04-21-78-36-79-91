@@ -37,6 +37,9 @@ interface GerenciarParentescosProps {
 }
 
 const tiposParentesco = [
+  { value: 'esposo', label: 'Esposo' },
+  { value: 'esposa', label: 'Esposa' },
+  { value: 'conjuge', label: 'Cônjuge' },
   { value: 'pai', label: 'Pai' },
   { value: 'mae', label: 'Mãe' },
   { value: 'filho', label: 'Filho' },

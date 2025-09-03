@@ -11932,6 +11932,9 @@ export type Database = {
         | "responsavel"
         | "membro"
         | "outro"
+        | "esposo"
+        | "esposa"
+        | "conjuge"
       tipo_responsabilidade_enum:
         | "pai_biologico"
         | "mae_biologica"
@@ -12203,6 +12206,9 @@ export const Constants = {
         "responsavel",
         "membro",
         "outro",
+        "esposo",
+        "esposa",
+        "conjuge",
       ],
       tipo_responsabilidade_enum: [
         "pai_biologico",
