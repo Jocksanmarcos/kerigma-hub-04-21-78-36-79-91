@@ -361,7 +361,10 @@ const GestaoFamilias: React.FC = () => {
   };
 
   const vincularPessoaFamilia = async () => {
+    console.log('🔗 Iniciando vinculação:', { selectedPessoa, selectedFamilia });
+    
     if (!selectedPessoa || !selectedFamilia) {
+      console.log('❌ Dados insuficientes para vinculação');
       toast({
         title: 'Aviso',
         description: 'Selecione uma pessoa e uma família.',
@@ -371,8 +374,9 @@ const GestaoFamilias: React.FC = () => {
     }
 
     try {
+      console.log('🔍 Verificando vínculos existentes...');
       // Verificar se já existe vínculo na tabela vinculos_familiares
-      const { data: vinculoExistente } = await supabase
+      const { data: vinculoExistente, error: verificacaoError } = await supabase
         .from('vinculos_familiares')
         .select(`
           id,
@@ -383,18 +387,31 @@ const GestaoFamilias: React.FC = () => {
         .eq('pessoa_id', selectedPessoa)
         .maybeSingle();
 
+      console.log('🔍 Resultado da verificação de vínculo:', { vinculoExistente, verificacaoError });
+
+      if (verificacaoError) {
+        console.log('❌ Erro na verificação:', verificacaoError);
+        throw verificacaoError;
+      }
+
       if (vinculoExistente) {
+        console.log('✅ Vínculo existente encontrado:', vinculoExistente);
         const familiaVinculada = (vinculoExistente.familias as any)?.nome_familia;
         
         // Se está tentando vincular à mesma família que já está vinculada, apenas corrigir a inconsistência
         if (vinculoExistente.familia_id === selectedFamilia) {
+          console.log('🔄 Corrigindo inconsistência para a mesma família');
           const { error: updateError } = await supabase
             .from('pessoas')
             .update({ familia_id: selectedFamilia })
             .eq('id', selectedPessoa);
 
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.log('❌ Erro ao corrigir inconsistência:', updateError);
+            throw updateError;
+          }
 
+          console.log('✅ Inconsistência corrigida com sucesso');
           toast({
             title: 'Sucesso',
             description: 'Vínculo corrigido com sucesso!',
@@ -408,21 +425,29 @@ const GestaoFamilias: React.FC = () => {
           setSelectedFamilia('');
           return;
         } else {
+          console.log('🔄 Transferindo pessoa para nova família');
           // Se está tentando vincular a uma família diferente, atualizar o vínculo
           const { error: updateVinculoError } = await supabase
             .from('vinculos_familiares')
             .update({ familia_id: selectedFamilia })
             .eq('pessoa_id', selectedPessoa);
 
-          if (updateVinculoError) throw updateVinculoError;
+          if (updateVinculoError) {
+            console.log('❌ Erro ao atualizar vínculo:', updateVinculoError);
+            throw updateVinculoError;
+          }
 
           const { error: updatePessoaError } = await supabase
             .from('pessoas')
             .update({ familia_id: selectedFamilia })
             .eq('id', selectedPessoa);
 
-          if (updatePessoaError) throw updatePessoaError;
+          if (updatePessoaError) {
+            console.log('❌ Erro ao atualizar pessoa:', updatePessoaError);
+            throw updatePessoaError;
+          }
 
+          console.log('✅ Transferência concluída com sucesso');
           toast({
             title: 'Sucesso',
             description: 'Pessoa transferida para nova família com sucesso!',
@@ -438,16 +463,23 @@ const GestaoFamilias: React.FC = () => {
         }
       }
 
+      console.log('🆕 Criando novo vínculo familiar');
       // Se não há vínculo existente, criar novo vínculo
       // Atualizar na tabela pessoas
+      console.log('📝 Atualizando tabela pessoas...');
       const { error: updateError } = await supabase
         .from('pessoas')
         .update({ familia_id: selectedFamilia })
         .eq('id', selectedPessoa);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.log('❌ Erro ao atualizar tabela pessoas:', updateError);
+        throw updateError;
+      }
+      console.log('✅ Tabela pessoas atualizada');
 
       // Criar vínculo na tabela vinculos_familiares
+      console.log('📝 Criando vínculo na tabela vinculos_familiares...');
       const { error: vinculoError } = await supabase
         .from('vinculos_familiares')
         .insert({
@@ -457,8 +489,13 @@ const GestaoFamilias: React.FC = () => {
           responsavel_familiar: false
         });
 
-      if (vinculoError) throw vinculoError;
+      if (vinculoError) {
+        console.log('❌ Erro ao criar vínculo familiar:', vinculoError);
+        throw vinculoError;
+      }
+      console.log('✅ Vínculo familiar criado');
 
+      console.log('🎉 Vinculação concluída com sucesso!');
       toast({
         title: 'Sucesso',
         description: 'Pessoa vinculada à família com sucesso!',
