@@ -67,6 +67,7 @@ import {
   Cell
 } from 'recharts';
 import { ModalAdicionarPessoa } from '@/components/missoes/modals/ModalAdicionarPessoa';
+import { ModalPerfilPessoa } from '@/components/pessoas/ModalPerfilPessoa';
 import GestaoFamilias from '@/components/familias/GestaoFamilias';
 import MapaLocalizacao from '@/components/localizacao/MapaLocalizacao';
 
@@ -879,6 +880,8 @@ const PessoasV2Page: React.FC = () => {
   const [celulas, setCelulas] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPessoa, setSelectedPessoa] = useState<Pessoa | null>(null);
+  const [isPerfilModalOpen, setIsPerfilModalOpen] = useState(false);
   const { toast } = useToast();
 
   // KPI Intelligent Cards state
@@ -1018,10 +1021,8 @@ const PessoasV2Page: React.FC = () => {
         }
         break;
       case 'view':
-        toast({
-          title: 'Visualizar Perfil',
-          description: `Abrindo perfil de ${pessoa.nome_completo}`,
-        });
+        setSelectedPessoa(pessoa);
+        setIsPerfilModalOpen(true);
         break;
       case 'edit':
         toast({
@@ -1514,6 +1515,17 @@ const PessoasV2Page: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* Modal para visualizar perfil da pessoa */}
+      <ModalPerfilPessoa
+        pessoa={selectedPessoa}
+        isOpen={isPerfilModalOpen}
+        onClose={() => {
+          setIsPerfilModalOpen(false);
+          setSelectedPessoa(null);
+        }}
+        onAction={handleMemberAction}
       />
     </AppLayout>
   );
