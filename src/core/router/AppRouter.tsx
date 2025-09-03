@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 // Lazy load pages for better performance
 const Index = React.lazy(() => import("@/pages/Index"));
 const DashboardPage = React.lazy(() => import("@/pages/dashboard/DashboardPage"));
+const PessoasV2Page = React.lazy(() => import("@/pages/dashboard/PessoasV2Page"));
 // People management pages removed
 const FinanceiroPage = React.lazy(() => import("@/pages/dashboard/FinanceiroPage"));
 const AgendaPage = React.lazy(() => import("@/pages/dashboard/AgendaPage"));
@@ -120,6 +121,7 @@ export const AppRouter: React.FC = () => {
         <Route path="/admin" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         
+        <Route path="/pessoas-v2" element={<ProtectedRoute><PessoasV2Page /></ProtectedRoute>} />
         {/* People management routes removed */}
         <Route path="/dashboard/biblioteca" element={<ProtectedRoute>{React.createElement(React.lazy(() => import("@/pages/dashboard/BibliotecaPage")))}</ProtectedRoute>} />
         <Route path="/dashboard/celulas" element={<ProtectedRoute><CelulasPage /></ProtectedRoute>} />
