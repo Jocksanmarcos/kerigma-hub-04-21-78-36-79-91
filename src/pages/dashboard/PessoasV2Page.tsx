@@ -52,9 +52,11 @@ interface Pessoa {
   tipo_pessoa: string;
   situacao: string;
   data_nascimento?: string;
+  data_membresia?: string;
   celula_id?: string;
   celulas?: { nome: string };
   foto_url?: string;
+  dons_talentos?: string[];
 }
 
 interface FiltrosPessoas {
@@ -381,6 +383,179 @@ const ListaMembro: React.FC<ListaMembroProps> = ({ pessoas, onAction }) => {
   );
 };
 
+// Componente para exibir aniversariantes
+const AniversariosContent: React.FC = () => {
+  const [aniversariantes, setAniversariantes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAniversariantes = async () => {
+      try {
+        const { data } = await supabase
+          .from('pessoas')
+          .select('id, nome_completo, data_nascimento, telefone, email, foto_url')
+          .eq('situacao', 'ativo')
+          .not('data_nascimento', 'is', null);
+
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth();
+        
+        const aniversariantesDoMes = data?.filter((pessoa: any) => {
+          const dataNasc = new Date(pessoa.data_nascimento);
+          return dataNasc.getMonth() === mesAtual;
+        }).sort((a: any, b: any) => {
+          const diaA = new Date(a.data_nascimento).getDate();
+          const diaB = new Date(b.data_nascimento).getDate();
+          return diaA - diaB;
+        }) || [];
+
+        setAniversariantes(aniversariantesDoMes);
+      } catch (error) {
+        console.error('Erro ao buscar aniversariantes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAniversariantes();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-8">Carregando aniversariantes...</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {aniversariantes.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          Nenhum aniversariante neste mês
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {aniversariantes.map((pessoa) => {
+            const dataNasc = new Date(pessoa.data_nascimento);
+            const idade = new Date().getFullYear() - dataNasc.getFullYear();
+            
+            return (
+              <div key={pessoa.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src={pessoa.foto_url} alt={pessoa.nome_completo} />
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {pessoa.nome_completo.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h3 className="font-semibold">{pessoa.nome_completo}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {dataNasc.getDate()}/{dataNasc.getMonth() + 1} - {idade} anos
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {pessoa.telefone && (
+                    <Button size="sm" variant="outline">
+                      <MessageCircle className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {pessoa.email && (
+                    <Button size="sm" variant="outline">
+                      <Mail className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Componente para exibir análises
+interface AnalisesContentProps {
+  kpiData: KPIData;
+}
+
+const AnalisesContent: React.FC<AnalisesContentProps> = ({ kpiData }) => {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">Crescimento de Membros</h3>
+          <div className="text-2xl font-bold text-green-600">{kpiData.novosMembros}</div>
+          <p className="text-sm text-muted-foreground">Novos membros nos últimos 30 dias</p>
+        </Card>
+        
+        <Card className="p-4">
+          <h3 className="font-semibold mb-2">Taxa de Engajamento</h3>
+          <div className="text-2xl font-bold text-blue-600">{kpiData.engajamento}%</div>
+          <p className="text-sm text-muted-foreground">Pessoas ativas em células</p>
+        </Card>
+      </div>
+
+      <Card className="p-4">
+        <h3 className="font-semibold mb-4">Insights Importantes</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm">
+            <Badge variant="secondary">Visitantes</Badge>
+            <span>{kpiData.visitantes} pessoas precisam de acompanhamento</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Badge variant="secondary">Aniversários</Badge>
+            <span>{kpiData.aniversariantes} aniversariantes esta semana</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Badge variant={kpiData.engajamento > 70 ? 'default' : 'destructive'}>
+              Engajamento
+            </Badge>
+            <span>
+              {kpiData.engajamento > 70 ? 'Excelente' : 'Precisa melhorar'} nível de participação em células
+            </span>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// Componente para gestão de famílias
+const FamiliasContent: React.FC = () => {
+  return (
+    <div className="space-y-4">
+      <div className="text-center py-8">
+        <Heart className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-semibold mb-2">Gestão de Famílias</h3>
+        <p className="text-muted-foreground mb-4">
+          Organize e gerencie vínculos familiares entre os membros
+        </p>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Vincular Família
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Componente para mapeamento por localização
+const LocalizacaoContent: React.FC = () => {
+  return (
+    <div className="space-y-4">
+      <div className="text-center py-8">
+        <MapPin className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <h3 className="text-lg font-semibold mb-2">Mapeamento por Localização</h3>
+        <p className="text-muted-foreground mb-4">
+          Visualize a distribuição geográfica dos membros da igreja
+        </p>
+        <Button>
+          <MapPin className="h-4 w-4 mr-2" />
+          Ver Mapa
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const PessoasV2Page: React.FC = () => {
   // Main state management - Mobile First foundation
   const [activeTab, setActiveTab] = useState('diretorio');
@@ -424,11 +599,16 @@ const PessoasV2Page: React.FC = () => {
 
   const loadCelulas = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('celulas')
         .select('id, nome')
         .eq('ativa', true)
         .order('nome');
+      
+      if (error) {
+        console.error('Erro ao carregar células:', error);
+        return;
+      }
       
       setCelulas(data || []);
     } catch (error) {
@@ -452,6 +632,8 @@ const PessoasV2Page: React.FC = () => {
           data_nascimento,
           celula_id,
           foto_url,
+          data_membresia,
+          dons_talentos,
           celulas!pessoas_celula_id_fkey (nome)
         `);
 
@@ -474,7 +656,11 @@ const PessoasV2Page: React.FC = () => {
 
       const { data, error } = await query.order('nome_completo');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro no Supabase:', error);
+        throw error;
+      }
+      
       setListaDePessoas(data || []);
 
     } catch (error) {
@@ -549,14 +735,14 @@ const PessoasV2Page: React.FC = () => {
     try {
       setKpiLoading(true);
 
-      // Novos membros (últimos 30 dias)
+      // Novos membros (últimos 30 dias) - usando data_membresia
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
       const { count: novosMembros } = await supabase
         .from('pessoas')
         .select('id', { count: 'exact', head: true })
-        .gte('data_membresia', thirtyDaysAgo.toISOString())
+        .gte('data_membresia', thirtyDaysAgo.toISOString().split('T')[0])
         .eq('situacao', 'ativo');
 
       // Visitantes ativos
@@ -572,22 +758,33 @@ const PessoasV2Page: React.FC = () => {
         .select('id', { count: 'exact', head: true })
         .eq('situacao', 'ativo');
 
-      // Aniversariantes da semana (usando função do banco)
-      const { data: aniversariantesData } = await supabase.rpc('get_aniversariantes_mes');
-      
-      // Filtrar apenas os aniversariantes desta semana
+      // Aniversariantes desta semana - buscar pessoas com aniversário nos próximos 7 dias
       const hoje = new Date();
-      const inicioSemana = new Date(hoje);
-      inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-      const fimSemana = new Date(inicioSemana);
-      fimSemana.setDate(inicioSemana.getDate() + 6);
+      const { data: todasPessoas } = await supabase
+        .from('pessoas')
+        .select('data_nascimento')
+        .eq('situacao', 'ativo')
+        .not('data_nascimento', 'is', null);
 
-      const aniversariantesSemana = aniversariantesData?.filter((pessoa: any) => {
+      const aniversariantesSemana = todasPessoas?.filter((pessoa: any) => {
         if (!pessoa.data_nascimento) return false;
+        
         const dataNasc = new Date(pessoa.data_nascimento);
-        const mesmoMes = dataNasc.getMonth() === hoje.getMonth();
-        const diasParaAniversario = pessoa.dias_para_aniversario;
-        return mesmoMes && diasParaAniversario >= 0 && diasParaAniversario <= 7;
+        const hoje = new Date();
+        
+        // Calcular o próximo aniversário
+        const proximoAniversario = new Date(hoje.getFullYear(), dataNasc.getMonth(), dataNasc.getDate());
+        
+        // Se já passou este ano, usar o próximo ano
+        if (proximoAniversario < hoje) {
+          proximoAniversario.setFullYear(hoje.getFullYear() + 1);
+        }
+        
+        // Calcular diferença em dias
+        const diffTime = proximoAniversario.getTime() - hoje.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        return diffDays >= 0 && diffDays <= 7;
       }) || [];
 
       // Calcular engajamento (pessoas ativas com células vs total)
@@ -847,22 +1044,63 @@ const PessoasV2Page: React.FC = () => {
             </>
           )}
 
-          {/* Other Tab Content Placeholders */}
-          {activeTab !== 'diretorio' && (
-            <Card className="p-8">
-              <div className="text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                  <Clock className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    Área de Conteúdo: {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Esta seção será implementada no próximo passo.
-                  </p>
-                </div>
-              </div>
+          {/* Aba Aniversários */}
+          {activeTab === 'aniversarios' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Aniversários do Mês
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AniversariosContent />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Aba Análises */}
+          {activeTab === 'analises' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Análises e Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AnalisesContent kpiData={kpiData} />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Aba Famílias */}
+          {activeTab === 'familias' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Heart className="h-5 w-5" />
+                  Gestão de Famílias
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FamiliasContent />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Aba Localização */}
+          {activeTab === 'localizacao' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Mapeamento por Localização
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LocalizacaoContent />
+              </CardContent>
             </Card>
           )}
         </div>
