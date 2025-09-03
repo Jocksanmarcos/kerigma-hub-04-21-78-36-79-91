@@ -562,9 +562,9 @@ const PessoasV2Page: React.FC = () => {
   const [viewMode, setViewMode] = useState<'lista' | 'cards'>('cards');
   const [filtrosPessoas, setFiltrosPessoas] = useState<FiltrosPessoas>({
     termoBusca: '',
-    status: '',
-    celulaId: '',
-    tipoPessoa: '',
+    status: 'all',
+    celulaId: 'all',
+    tipoPessoa: 'all',
   });
   const [listaDePessoas, setListaDePessoas] = useState<Pessoa[]>([]);
   const [celulas, setCelulas] = useState<any[]>([]);
@@ -642,15 +642,15 @@ const PessoasV2Page: React.FC = () => {
         query = query.or(`nome_completo.ilike.%${filtrosPessoas.termoBusca}%,email.ilike.%${filtrosPessoas.termoBusca}%`);
       }
       
-      if (filtrosPessoas.status) {
+      if (filtrosPessoas.status && filtrosPessoas.status !== 'all') {
         query = query.eq('situacao', filtrosPessoas.status);
       }
       
-      if (filtrosPessoas.tipoPessoa) {
+      if (filtrosPessoas.tipoPessoa && filtrosPessoas.tipoPessoa !== 'all') {
         query = query.eq('tipo_pessoa', filtrosPessoas.tipoPessoa);
       }
       
-      if (filtrosPessoas.celulaId) {
+      if (filtrosPessoas.celulaId && filtrosPessoas.celulaId !== 'all') {
         query = query.eq('celula_id', filtrosPessoas.celulaId);
       }
 
@@ -685,9 +685,9 @@ const PessoasV2Page: React.FC = () => {
   const clearFilters = () => {
     setFiltrosPessoas({
       termoBusca: '',
-      status: '',
-      celulaId: '',
-      tipoPessoa: '',
+      status: 'all',
+      celulaId: 'all',
+      tipoPessoa: 'all',
     });
   };
 
@@ -914,7 +914,7 @@ const PessoasV2Page: React.FC = () => {
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent className="bg-background border shadow-lg z-50">
-                        <SelectItem value="">Todos os Status</SelectItem>
+                        <SelectItem value="all">Todos os Status</SelectItem>
                         <SelectItem value="ativo">Ativo</SelectItem>
                         <SelectItem value="inativo">Inativo</SelectItem>
                         <SelectItem value="afastado">Afastado</SelectItem>
@@ -929,7 +929,7 @@ const PessoasV2Page: React.FC = () => {
                         <SelectValue placeholder="Tipo de Pessoa" />
                       </SelectTrigger>
                       <SelectContent className="bg-background border shadow-lg z-50">
-                        <SelectItem value="">Todos os Tipos</SelectItem>
+                        <SelectItem value="all">Todos os Tipos</SelectItem>
                         <SelectItem value="membro">Membro</SelectItem>
                         <SelectItem value="visitante">Visitante</SelectItem>
                         <SelectItem value="lider">Líder</SelectItem>
@@ -944,7 +944,7 @@ const PessoasV2Page: React.FC = () => {
                         <SelectValue placeholder="Célula" />
                       </SelectTrigger>
                       <SelectContent className="bg-background border shadow-lg z-50">
-                        <SelectItem value="">Todas as Células</SelectItem>
+                        <SelectItem value="all">Todas as Células</SelectItem>
                         {celulas.map((celula) => (
                           <SelectItem key={celula.id} value={celula.id}>
                             {celula.nome}

@@ -190,7 +190,7 @@ export const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
         data_batismo: formData.dataBatismo || null,
         data_membresia: formData.dataMembresia || null,
         tipo_pessoa: formData.tipoPessoa,
-        celula_id: formData.celulaId || null,
+        celula_id: formData.celulaId && formData.celulaId !== 'none' ? formData.celulaId : null,
         endereco: formData.endereco || null,
         cidade: formData.cidade || null,
         estado: formData.estado || null,
@@ -407,7 +407,7 @@ export const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
                     <SelectValue placeholder="Selecione a célula" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-lg z-50">
-                    <SelectItem value="">Nenhuma célula</SelectItem>
+                    <SelectItem value="none">Nenhuma célula</SelectItem>
                     {celulas.map((celula) => (
                       <SelectItem key={celula.id} value={celula.id}>
                         {celula.nome}
