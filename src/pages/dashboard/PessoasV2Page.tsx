@@ -82,9 +82,9 @@ const SegmentedNav: React.FC<SegmentedNavProps> = ({ activeTab, onTabChange }) =
 
   return (
     <div className="w-full">
-      {/* Mobile: Scrollable horizontal tabs */}
+      {/* Mobile: Grid layout com quebra de linha */}
       <div className="sm:hidden">
-        <div className="flex gap-1 p-1 bg-muted rounded-lg overflow-x-auto scrollbar-none">
+        <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-lg">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.value;
@@ -93,7 +93,7 @@ const SegmentedNav: React.FC<SegmentedNavProps> = ({ activeTab, onTabChange }) =
                 key={tab.value}
                 onClick={() => onTabChange(tab.value)}
                 className={`
-                  flex flex-col items-center justify-center min-w-[80px] px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap
+                  flex flex-col items-center justify-center px-3 py-2 rounded-md text-xs font-medium transition-all duration-200
                   ${isActive 
                     ? 'bg-background text-primary shadow-sm' 
                     : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
@@ -101,7 +101,7 @@ const SegmentedNav: React.FC<SegmentedNavProps> = ({ activeTab, onTabChange }) =
                 `}
               >
                 <Icon className={`h-4 w-4 mb-1 ${isActive ? 'text-primary' : ''}`} />
-                <span>{tab.label}</span>
+                <span className="text-center">{tab.label}</span>
               </button>
             );
           })}
