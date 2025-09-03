@@ -75,7 +75,7 @@ export const CelulasProntasMultiplicacao: React.FC = () => {
   };
 
   const getPercentualColor = (percentual: number) => {
-    if (percentual >= 90) return 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30';
+    if (percentual >= 90) return 'text-green-600 bg-green-50 dark:bg-green-950/30';
     if (percentual >= 80) return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950/30';
     return 'text-blue-600 bg-blue-50 dark:bg-blue-950/30';
   };
@@ -104,7 +104,7 @@ export const CelulasProntasMultiplicacao: React.FC = () => {
           <div className="space-y-4">
             {celulas.map((celula) => (
               <div key={celula.id} className={`p-4 rounded-lg border-l-4 ${
-                celula.cor === 'green' ? 'border-l-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20' : 
+                celula.cor === 'green' ? 'border-l-green-500 bg-green-50/50 dark:bg-green-950/20' : 
                 'border-l-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/20'
               }`}>
                 <div className="flex items-center justify-between mb-3">
@@ -129,7 +129,7 @@ export const CelulasProntasMultiplicacao: React.FC = () => {
                   <Button
                     size="sm"
                     onClick={() => handleIniciarMultiplicacao(celula)}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="bg-green-600 hover:bg-green-700 text-white"
                   >
                     <Play className="h-4 w-4 mr-2" />
                     Iniciar Multiplicação
