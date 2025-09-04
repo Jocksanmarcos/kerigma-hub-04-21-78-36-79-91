@@ -11897,6 +11897,10 @@ export type Database = {
         Args: { user_uuid?: string }
         Returns: boolean
       }
+      is_lider_ministerio: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       is_pastor_missao: {
         Args: { uid?: string }
         Returns: boolean

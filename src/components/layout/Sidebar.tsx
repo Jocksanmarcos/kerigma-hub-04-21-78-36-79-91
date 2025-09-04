@@ -25,6 +25,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { useNewUserRole, newRolePermissions, UserRole } from '@/hooks/useNewRole';
+import { useIsLiderMinisterio } from '@/hooks/useMinisterioRole';
 import {
   Sidebar as SidebarUI,
   SidebarContent,
@@ -46,7 +47,7 @@ const principalNavItems = [
 const pessoasGruposNavItems = [
   { title: 'Pessoas v2', url: '/pessoas-v2', icon: Users, page: 'pessoas-v2', roles: ['pastor'] },
   { title: 'Células', url: '/dashboard/celulas', icon: HeartHandshake, page: 'celulas', roles: ['pastor', 'lider'] },
-  { title: 'Ministérios', url: '/dashboard/ministerios', icon: Music, page: 'ministerios', roles: ['pastor', 'lider'] },
+  { title: 'Ministérios', url: '/dashboard/ministerios', icon: Music, page: 'ministerios', roles: ['pastor'] },
   { title: 'Busca de Talentos', url: '/admin/busca-voluntarios', icon: Search, page: 'busca-voluntarios', roles: ['pastor', 'lider'] },
 ];
 
@@ -92,6 +93,7 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { data: userRole } = useNewUserRole();
+  const { data: isLiderMinisterio } = useIsLiderMinisterio();
 
   const isActive = (path: string) => {
     if (path === '/dashboard') {
@@ -107,20 +109,26 @@ export const Sidebar: React.FC = () => {
   };
 
   // Helper function to check if user has required role
-  const hasRequiredRole = (itemRoles?: string[]) => {
+  const hasRequiredRole = (itemRoles?: string[], itemUrl?: string) => {
     if (!itemRoles || itemRoles.length === 0) return true; // No role restriction
     if (!userRole) return false; // User has no role
+    
+    // Lógica especial para ministérios - apenas pastores ou líderes de ministério
+    if (itemUrl === '/dashboard/ministerios') {
+      return userRole === 'pastor' || isLiderMinisterio === true;
+    }
+    
     return itemRoles.includes(userRole);
   };
 
   // Filter items based on user role
-  const filteredPrincipalItems = principalNavItems.filter(item => hasRequiredRole(item.roles));
-  const filteredPessoasGruposItems = pessoasGruposNavItems.filter(item => hasRequiredRole(item.roles));
-  const filteredDesenvolvimentoItems = desenvolvimentoNavItems.filter(item => hasRequiredRole(item.roles));
-  const filteredOperacoesItems = operacoesNavItems.filter(item => hasRequiredRole(item.roles));
-  const filteredFinancasItems = financasNavItems.filter(item => hasRequiredRole(item.roles));
-  const filteredRelatoriosItems = relatoriosNavItems.filter(item => hasRequiredRole(item.roles));
-  const filteredAdminItems = adminNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredPrincipalItems = principalNavItems.filter(item => hasRequiredRole(item.roles, item.url));
+  const filteredPessoasGruposItems = pessoasGruposNavItems.filter(item => hasRequiredRole(item.roles, item.url));
+  const filteredDesenvolvimentoItems = desenvolvimentoNavItems.filter(item => hasRequiredRole(item.roles, item.url));
+  const filteredOperacoesItems = operacoesNavItems.filter(item => hasRequiredRole(item.roles, item.url));
+  const filteredFinancasItems = financasNavItems.filter(item => hasRequiredRole(item.roles, item.url));
+  const filteredRelatoriosItems = relatoriosNavItems.filter(item => hasRequiredRole(item.roles, item.url));
+  const filteredAdminItems = adminNavItems.filter(item => hasRequiredRole(item.roles, item.url));
 
   return (
     <SidebarUI className={collapsed ? "w-14" : "w-64"}>
