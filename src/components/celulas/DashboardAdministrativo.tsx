@@ -63,7 +63,7 @@ export const DashboardAdministrativo: React.FC = () => {
           supervisor:pessoas!supervisor_id(id, nome_completo),
           coordenador:pessoas!coordenador_id(id, nome_completo),
           pastor_rede:pessoas!pastor_rede_id(id, nome_completo),
-          membros:pessoas!celula_id(count),
+          membros:pessoas!fk_pessoas_celula(count),
           relatorios:relatorios_celulas!celula_id(
             data_reuniao,
             presentes,
