@@ -13,14 +13,26 @@ import { QRCodeScanner } from '@/components/biblioteca/QRCodeScanner';
 import BibliotecaStats from '@/components/biblioteca/BibliotecaStats';
 import BibliotecaRelatorios from '@/components/biblioteca/BibliotecaRelatorios';
 import { BibliotecaNotificacoesContainer } from '@/components/biblioteca/BibliotecaNotificacoesContainer';
+import { BibliotecaMembroView } from '@/components/biblioteca/BibliotecaMembroView';
+import { useNewUserRole } from '@/hooks/useNewRole';
 
 const BibliotecaPage = () => {
+  const { data: userRole } = useNewUserRole();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showCadastroLivro, setShowCadastroLivro] = useState(false);
   const [showEmprestimo, setShowEmprestimo] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 
   // Dados agora vêm do hook de estatísticas em tempo real
+
+  // Se não for pastor, mostrar visualização de membro
+  if (userRole !== 'pastor') {
+    return (
+      <AppLayout>
+        <BibliotecaMembroView />
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>

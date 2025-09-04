@@ -11716,6 +11716,10 @@ export type Database = {
           papel: string
         }[]
       }
+      get_combined_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_complete_family: {
         Args: { p_pessoa_id: string }
         Returns: {
@@ -11887,6 +11891,10 @@ export type Database = {
       }
       is_any_admin: {
         Args: { uid?: string }
+        Returns: boolean
+      }
+      is_lider_celula: {
+        Args: { user_uuid?: string }
         Returns: boolean
       }
       is_pastor_missao: {
@@ -12095,7 +12103,7 @@ export type Database = {
         | "exportar"
         | "gerenciar"
         | "administrar"
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "pastor" | "lider" | "membro"
       church_role:
         | "super_admin"
         | "pastor"
@@ -12360,7 +12368,7 @@ export const Constants = {
         "gerenciar",
         "administrar",
       ],
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "pastor", "lider", "membro"],
       church_role: [
         "super_admin",
         "pastor",

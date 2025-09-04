@@ -107,7 +107,12 @@ export const Sidebar: React.FC = () => {
   };
 
   // Filter items based on user role
-  const filteredPrincipalItems = principalNavItems;
+  const filteredPrincipalItems = principalNavItems.filter(item => {
+    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
+      return false;
+    }
+    return true;
+  });
   
   const filteredPessoasGruposItems = pessoasGruposNavItems.filter(item => {
     if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {

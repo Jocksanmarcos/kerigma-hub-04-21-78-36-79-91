@@ -25,25 +25,19 @@ export function useNewUserRole() {
           return;
         }
         
-        // Buscar role do usuário na nova tabela
-        const { data: roleData, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('active', true)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        // Usar a nova função que combina user_roles e papel_lideranca
+        const { data: combinedRole, error } = await supabase
+          .rpc('get_combined_user_role');
         
         // Fallback: se for o e-mail do administrador padrão, considere 'pastor'
         const isBootstrapAdmin = user.email?.toLowerCase() === 'admin@cbnkerigma.org.br';
         
         if (mounted) {
           if (error) {
-            console.warn("Error fetching user role:", error);
+            console.warn("Error fetching combined user role:", error);
             setData(isBootstrapAdmin ? 'pastor' as UserRole : 'membro' as UserRole);
           } else {
-            const role = (roleData?.role as UserRole) || (isBootstrapAdmin ? 'pastor' as UserRole : 'membro' as UserRole);
+            const role = (combinedRole as UserRole) || (isBootstrapAdmin ? 'pastor' as UserRole : 'membro' as UserRole);
             setData(role);
           }
           setIsLoading(false);
