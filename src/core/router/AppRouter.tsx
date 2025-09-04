@@ -69,6 +69,7 @@ const NotFound = React.lazy(() => import("@/pages/NotFound"));
 const SiteMapPage = React.lazy(() => import("@/pages/SiteMapPage"));
 const RecepcaoPage = React.lazy(() => import("@/pages/recepcao/RecepcaoPage"));
 const BibleImportPage = React.lazy(() => import("@/pages/BibleImportPage"));
+const MuralGenerosidadePage = React.lazy(() => import("@/pages/MuralGenerosidadePage"));
 
 const MinimalLoader = () => <PageLoader type="minimal" />;
 
@@ -109,6 +110,7 @@ export const AppRouter: React.FC = () => {
         {/* Generosity Routes */}
         <Route path="/semear" element={React.createElement(React.lazy(() => import("@/pages/public/SemearTransformarPage")))} />
         <Route path="/semear/:status" element={React.createElement(React.lazy(() => import("@/pages/public/DonationStatusPage")))} />
+        <Route path="/mural-da-generosidade" element={<ProtectedRoute><MuralGenerosidadePage /></ProtectedRoute>} />
 
         {/* Auth Routes */}
         <Route path="/auth" element={<AuthPage />} />

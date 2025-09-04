@@ -6538,6 +6538,125 @@ export type Database = {
         }
         Relationships: []
       }
+      mural_doacoes: {
+        Row: {
+          categoria: string
+          church_id: string | null
+          created_at: string
+          descricao: string | null
+          doador_id: string
+          fotos_urls: string[] | null
+          id: string
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string
+          church_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          doador_id: string
+          fotos_urls?: string[] | null
+          id?: string
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          church_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          doador_id?: string
+          fotos_urls?: string[] | null
+          id?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mural_interessados: {
+        Row: {
+          church_id: string | null
+          created_at: string
+          doacao_id: string
+          id: string
+          interessado_id: string
+          mensagem: string | null
+          status: string
+        }
+        Insert: {
+          church_id?: string | null
+          created_at?: string
+          doacao_id: string
+          id?: string
+          interessado_id: string
+          mensagem?: string | null
+          status?: string
+        }
+        Update: {
+          church_id?: string | null
+          created_at?: string
+          doacao_id?: string
+          id?: string
+          interessado_id?: string
+          mensagem?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mural_interessados_doacao_id_fkey"
+            columns: ["doacao_id"]
+            isOneToOne: false
+            referencedRelation: "mural_doacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mural_pedidos_ajuda: {
+        Row: {
+          atendido_por_diacono_id: string | null
+          categoria: string
+          church_id: string | null
+          created_at: string
+          descricao_necessidade: string
+          id: string
+          observacoes_diaconia: string | null
+          publicado_anonimamente: boolean | null
+          solicitante_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          atendido_por_diacono_id?: string | null
+          categoria?: string
+          church_id?: string | null
+          created_at?: string
+          descricao_necessidade: string
+          id?: string
+          observacoes_diaconia?: string | null
+          publicado_anonimamente?: boolean | null
+          solicitante_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          atendido_por_diacono_id?: string | null
+          categoria?: string
+          church_id?: string | null
+          created_at?: string
+          descricao_necessidade?: string
+          id?: string
+          observacoes_diaconia?: string | null
+          publicado_anonimamente?: boolean | null
+          solicitante_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       musicas_lista: {
         Row: {
           artista: string | null

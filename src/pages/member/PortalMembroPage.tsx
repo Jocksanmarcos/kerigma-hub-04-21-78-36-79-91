@@ -33,6 +33,15 @@ const PortalMembroPage: React.FC = () => {
       action: () => navigate('/semear')
     },
     {
+      icon: Heart,
+      title: 'Mural da Generosidade',
+      description: 'Doar e pedir ajuda',
+      color: 'text-green-600',
+      bgColor: 'bg-green-50 hover:bg-green-100',
+      borderColor: 'border-green-200',
+      action: () => navigate('/mural-da-generosidade')
+    },
+    {
       icon: Calendar,
       title: 'Agenda',
       description: 'Eventos da igreja',
