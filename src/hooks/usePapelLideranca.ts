@@ -17,6 +17,20 @@ export const usePapelLideranca = () => {
       }
 
       try {
+        // Verificar se é líder de célula pela tabela celulas
+        const { data: celulaData, error: celulaError } = await supabase
+          .from('celulas')
+          .select('id, nome')
+          .eq('lider_id', pessoa.id)
+          .eq('ativa', true)
+          .single();
+
+        if (!celulaError && celulaData) {
+          setPapelLideranca('lider_celula');
+          return;
+        }
+
+        // Se não for líder de célula, verificar papel na tabela pessoas
         const { data, error } = await supabase
           .from('pessoas')
           .select('papel_lideranca')
@@ -25,12 +39,14 @@ export const usePapelLideranca = () => {
 
         if (error) {
           console.error('Erro ao buscar papel de liderança:', error);
+          setPapelLideranca('membro');
           return;
         }
 
         setPapelLideranca((data?.papel_lideranca as PapelLideranca) || 'membro');
       } catch (error) {
         console.error('Erro ao buscar papel de liderança:', error);
+        setPapelLideranca('membro');
       } finally {
         setLoading(false);
       }
