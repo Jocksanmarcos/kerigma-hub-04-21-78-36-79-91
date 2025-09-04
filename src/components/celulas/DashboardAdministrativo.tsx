@@ -19,6 +19,8 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CriarCelulaDialog } from './CriarCelulaDialog';
+import { VisualizarCelulaDialog } from './VisualizarCelulaDialog';
+import { EditarCelulaDialog } from './EditarCelulaDialog';
 
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -42,6 +44,9 @@ interface CelulaAdmin {
 
 export const DashboardAdministrativo: React.FC = () => {
   const [showCriarCelula, setShowCriarCelula] = useState(false);
+  const [showVisualizarCelula, setShowVisualizarCelula] = useState(false);
+  const [showEditarCelula, setShowEditarCelula] = useState(false);
+  const [celulaSelecionada, setCelulaSelecionada] = useState<CelulaAdmin | null>(null);
   const [filtro, setFiltro] = useState('');
   const { toast } = useToast();
 
@@ -181,6 +186,16 @@ export const DashboardAdministrativo: React.FC = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleVisualizarCelula = (celula: CelulaAdmin) => {
+    setCelulaSelecionada(celula);
+    setShowVisualizarCelula(true);
+  };
+
+  const handleEditarCelula = (celula: CelulaAdmin) => {
+    setCelulaSelecionada(celula);
+    setShowEditarCelula(true);
   };
 
   if (isLoading) {
@@ -372,10 +387,18 @@ export const DashboardAdministrativo: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-1 justify-end">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleVisualizarCelula(celula)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditarCelula(celula)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -402,7 +425,18 @@ export const DashboardAdministrativo: React.FC = () => {
         onSuccess={refetch}
       />
 
-      
+      <VisualizarCelulaDialog
+        open={showVisualizarCelula}
+        onOpenChange={setShowVisualizarCelula}
+        celula={celulaSelecionada}
+      />
+
+      <EditarCelulaDialog
+        open={showEditarCelula}
+        onOpenChange={setShowEditarCelula}
+        celula={celulaSelecionada}
+        onSuccess={refetch}
+      />
     </div>
   );
 };
