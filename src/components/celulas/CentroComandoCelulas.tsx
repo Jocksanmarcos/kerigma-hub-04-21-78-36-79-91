@@ -112,9 +112,9 @@ export const CentroComandoCelulas: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Células Ativas</CardTitle>
@@ -139,8 +139,11 @@ export const CentroComandoCelulas: React.FC = () => {
             <div className="text-2xl font-bold text-emerald-600">
               {isLoading ? '...' : `${stats?.saudeGeral || 0}%`}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground hidden sm:block">
               Verde: {stats?.saudeDetalhada.verde || 0} | Amarelo: {stats?.saudeDetalhada.amarelo || 0} | Vermelho: {stats?.saudeDetalhada.vermelho || 0}
+            </p>
+            <p className="text-xs text-muted-foreground sm:hidden">
+              V:{stats?.saudeDetalhada.verde || 0} A:{stats?.saudeDetalhada.amarelo || 0} R:{stats?.saudeDetalhada.vermelho || 0}
             </p>
           </CardContent>
         </Card>
@@ -174,23 +177,23 @@ export const CentroComandoCelulas: React.FC = () => {
 
 
       {/* Main Interface */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="dashboard" className="flex items-center space-x-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+          <TabsTrigger value="dashboard" className="flex items-center justify-center space-x-1 sm:space-x-2 p-2 sm:p-3">
             <Users className="h-4 w-4" />
-            <span>Dashboard</span>
+            <span className="text-xs sm:text-sm">Dashboard</span>
           </TabsTrigger>
-          <TabsTrigger value="supervisor" className="flex items-center space-x-2">
+          <TabsTrigger value="supervisor" className="flex items-center justify-center space-x-1 sm:space-x-2 p-2 sm:p-3">
             <TrendingUp className="h-4 w-4" />
-            <span>Supervisão</span>
+            <span className="text-xs sm:text-sm">Supervisão</span>
           </TabsTrigger>
-          <TabsTrigger value="recursos" className="flex items-center space-x-2">
+          <TabsTrigger value="recursos" className="flex items-center justify-center space-x-1 sm:space-x-2 p-2 sm:p-3">
             <BookOpen className="h-4 w-4" />
-            <span>Recursos</span>
+            <span className="text-xs sm:text-sm">Recursos</span>
           </TabsTrigger>
-          <TabsTrigger value="visitantes" className="flex items-center space-x-2">
+          <TabsTrigger value="visitantes" className="flex items-center justify-center space-x-1 sm:space-x-2 p-2 sm:p-3">
             <Target className="h-4 w-4" />
-            <span>Visitantes</span>
+            <span className="text-xs sm:text-sm">Visitantes</span>
           </TabsTrigger>
         </TabsList>
 

@@ -138,28 +138,29 @@ export const DashboardLiderCelula: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header da Célula */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Minha Célula</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Minha Célula</h1>
           <p className="text-muted-foreground">{celulaData.nome}</p>
         </div>
-        <Button onClick={() => setShowRelatorio(true)} className="gap-2">
+        <Button onClick={() => setShowRelatorio(true)} className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
-          Novo Relatório
+          <span className="hidden sm:inline">Novo Relatório</span>
+          <span className="sm:hidden">Relatório</span>
         </Button>
       </div>
 
       {/* Cards de Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Membros</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{celulaData.membros}</div>
+            <div className="text-xl sm:text-2xl font-bold">{celulaData.membros}</div>
             <p className="text-xs text-muted-foreground">Total de membros ativos</p>
           </CardContent>
         </Card>
@@ -170,7 +171,7 @@ export const DashboardLiderCelula: React.FC = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{celulaData.presentes_ultima_reuniao}</div>
+            <div className="text-xl sm:text-2xl font-bold">{celulaData.presentes_ultima_reuniao}</div>
             <p className="text-xs text-muted-foreground">
               {celulaData.visitantes_ultima_reuniao} visitantes
             </p>
@@ -183,7 +184,7 @@ export const DashboardLiderCelula: React.FC = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold">
+            <div className="text-base sm:text-lg font-bold">
               {celulaData.proxima_reuniao ? 
                 format(new Date(celulaData.proxima_reuniao), 'dd/MM', { locale: ptBR }) : 
                 'Não agendada'
@@ -208,7 +209,7 @@ export const DashboardLiderCelula: React.FC = () => {
       </div>
 
       {/* Grid Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Lista de Membros */}
         <Card>
           <CardHeader>
@@ -319,20 +320,20 @@ export const DashboardLiderCelula: React.FC = () => {
           <CardDescription>Ferramentas para gestão da sua célula</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" onClick={() => setShowRelatorio(true)}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <Button variant="outline" onClick={() => setShowRelatorio(true)} className="text-xs sm:text-sm">
               <FileText className="h-4 w-4 mr-2" />
               Relatório
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" className="text-xs sm:text-sm">
               <Users className="h-4 w-4 mr-2" />
               Membros
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" className="text-xs sm:text-sm">
               <Calendar className="h-4 w-4 mr-2" />
               Agendar
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" className="text-xs sm:text-sm">
               <MessageSquare className="h-4 w-4 mr-2" />
               Contatos
             </Button>

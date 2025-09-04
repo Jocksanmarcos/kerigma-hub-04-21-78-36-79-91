@@ -144,9 +144,9 @@ export const BibliotecaRecursos: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header com Upload */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">Biblioteca de Recursos</h2>
           <p className="text-muted-foreground">
@@ -168,7 +168,7 @@ export const BibliotecaRecursos: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
             <div className="flex-1">
               <Input
                 placeholder="Buscar recursos por título ou tag..."
@@ -176,8 +176,9 @@ export const BibliotecaRecursos: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -190,7 +191,7 @@ export const BibliotecaRecursos: React.FC = () => {
               </SelectContent>
             </Select>
             <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -201,10 +202,7 @@ export const BibliotecaRecursos: React.FC = () => {
                 <SelectItem value="discipulado">Discipulado</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">
-              <Search className="h-4 w-4 mr-2" />
-              Buscar
-            </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -222,18 +220,18 @@ export const BibliotecaRecursos: React.FC = () => {
           ) : (
             recursosFiltrados.map((recurso) => (
           <Card key={recurso.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-3">
-                  <div className="p-2 bg-muted rounded-lg">
+            <CardHeader className="pb-3">
+              <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                <div className="flex items-start space-x-3 flex-1">
+                  <div className="p-2 bg-muted rounded-lg flex-shrink-0">
                     {getIconByType(recurso.tipo)}
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">{recurso.titulo}</CardTitle>
-                    <CardDescription className="mt-1">
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base sm:text-lg leading-tight">{recurso.titulo}</CardTitle>
+                    <CardDescription className="mt-1 text-sm">
                       {recurso.descricao}
                     </CardDescription>
-                    <div className="flex space-x-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2">
                       <Badge className={getTypeColor(recurso.tipo)}>
                         {recurso.tipo}
                       </Badge>
@@ -243,24 +241,26 @@ export const BibliotecaRecursos: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-muted-foreground">
+                <div className="flex flex-col items-end text-right flex-shrink-0">
+                  <div className="text-xs sm:text-sm text-muted-foreground mb-2">
                     {recurso.downloads} downloads
                   </div>
                   <Button 
-                    className="mt-2"
+                    size="sm"
+                    className="w-full sm:w-auto"
                     onClick={() => handleDownload(recurso)}
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Baixar
+                    <span className="hidden sm:inline">Baixar</span>
+                    <span className="sm:hidden">Download</span>
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
+            <CardContent className="pt-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex flex-wrap gap-1">
-                  <span className="text-sm text-muted-foreground mr-2">Público-alvo:</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground mr-2">Público-alvo:</span>
                   {recurso.publico_alvo.map((publico, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
                       {publico}
@@ -287,22 +287,22 @@ export const BibliotecaRecursos: React.FC = () => {
           <CardTitle>Estatísticas da Biblioteca</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">45</div>
-              <div className="text-sm text-muted-foreground">Total de Recursos</div>
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+            <div className="text-center p-3 sm:p-4 bg-muted/30 rounded-lg">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">45</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Total de Recursos</div>
             </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">1,234</div>
-              <div className="text-sm text-muted-foreground">Downloads Este Mês</div>
+            <div className="text-center p-3 sm:p-4 bg-muted/30 rounded-lg">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">1,234</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Downloads Este Mês</div>
             </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">12</div>
-              <div className="text-sm text-muted-foreground">Recursos Novos</div>
+            <div className="text-center p-3 sm:p-4 bg-muted/30 rounded-lg">
+              <div className="text-xl sm:text-2xl font-bold text-purple-600">12</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Recursos Novos</div>
             </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">8</div>
-              <div className="text-sm text-muted-foreground">Aguardando Aprovação</div>
+            <div className="text-center p-3 sm:p-4 bg-muted/30 rounded-lg">
+              <div className="text-xl sm:text-2xl font-bold text-orange-600">8</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Aguardando Aprovação</div>
             </div>
           </div>
         </CardContent>
