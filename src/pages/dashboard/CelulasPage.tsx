@@ -3,15 +3,15 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { CentroComandoCelulas } from "@/components/celulas/CentroComandoCelulas";
 import { DashboardLiderCelula } from "@/components/celulas/dashboards/DashboardLiderCelula";
 import { useNewUserRole } from '@/hooks/useNewRole';
-import { usePapelLideranca } from '@/hooks/usePapelLideranca';
+import { useIsLiderCelula } from '@/hooks/useIsLiderCelula';
 import { Helmet } from 'react-helmet-async';
 
 const CelulasPage: React.FC = () => {
   const { data: userRole } = useNewUserRole();
-  const { isLiderCelula, loading: loadingPapel } = usePapelLideranca();
+  const { data: isLiderCelula, isLoading: loadingLiderCelula } = useIsLiderCelula();
 
   // Se for líder de célula específico, mostrar dashboard específico
-  if (userRole === 'lider' && isLiderCelula && !loadingPapel) {
+  if (userRole === 'lider' && isLiderCelula && !loadingLiderCelula) {
     return (
       <>
         <Helmet>
