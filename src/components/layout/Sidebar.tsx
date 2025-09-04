@@ -53,10 +53,10 @@ const pessoasGruposNavItems = [
 // Desenvolvimento Ministerial
 const desenvolvimentoNavItems = [
   { title: 'Jornada de Crescimento', url: '/jornada', icon: GraduationCap, page: 'jornada' }, // Visível para todos
-  { title: 'Gerenciar Cursos', url: '/admin/jornada/cursos', icon: BookOpen, page: 'cursos', roles: ['pastor', 'lider'] },
-  { title: 'Gerenciar Quizzes', url: '/admin/jornada/quizzes', icon: CheckCircle, page: 'quizzes', roles: ['pastor', 'lider'] },
+  { title: 'Gerenciar Cursos', url: '/admin/jornada/cursos', icon: BookOpen, page: 'cursos', roles: ['pastor'] },
+  { title: 'Gerenciar Quizzes', url: '/admin/jornada/quizzes', icon: CheckCircle, page: 'quizzes', roles: ['pastor'] },
   { title: 'Aconselhamento', url: '/dashboard/aconselhamento', icon: MessageSquare, page: 'aconselhamento' }, // Disponível para membros também
-  { title: 'Missões', url: '/dashboard/missoes', icon: Globe, page: 'missoes', roles: ['pastor', 'lider'] },
+  { title: 'Missões', url: '/dashboard/missoes', icon: Globe, page: 'missoes', roles: ['pastor'] },
   { title: 'Biblioteca', url: '/dashboard/biblioteca', icon: BookOpen, page: 'biblioteca' }, // Visível para todos
 ];
 
@@ -80,7 +80,7 @@ const relatoriosNavItems = [
 
 // Administração do Sistema
 const adminNavItems = [
-  { title: 'Configurações', url: '/admin/configuracoes', icon: Settings, page: 'configuracoes', roles: ['pastor', 'lider'] },
+  { title: 'Configurações', url: '/admin/configuracoes', icon: Settings, page: 'configuracoes', roles: ['pastor'] },
   { title: 'Gestão de Conteúdo', url: '/admin/content', icon: MessageSquare, page: 'content', roles: ['pastor'] },
   { title: 'Governança', url: '/admin/governanca', icon: ShieldCheck, page: 'governanca', roles: ['pastor'] },
   { title: 'Suporte', url: '/suporte', icon: HelpCircle, page: 'suporte' },
@@ -106,55 +106,21 @@ export const Sidebar: React.FC = () => {
       : "hover:bg-muted/50 text-muted-foreground hover:text-foreground";
   };
 
+  // Helper function to check if user has required role
+  const hasRequiredRole = (itemRoles?: string[]) => {
+    if (!itemRoles || itemRoles.length === 0) return true; // No role restriction
+    if (!userRole) return false; // User has no role
+    return itemRoles.includes(userRole);
+  };
+
   // Filter items based on user role
-  const filteredPrincipalItems = principalNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
-  
-  const filteredPessoasGruposItems = pessoasGruposNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
-
-  const filteredDesenvolvimentoItems = desenvolvimentoNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
-
-  const filteredOperacoesItems = operacoesNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
-
-  const filteredFinancasItems = financasNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
-  
-  const filteredRelatoriosItems = relatoriosNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
-
-  const filteredAdminItems = adminNavItems.filter(item => {
-    if (item.roles && item.roles.length > 0 && userRole && !item.roles.includes(userRole)) {
-      return false;
-    }
-    return true;
-  });
+  const filteredPrincipalItems = principalNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredPessoasGruposItems = pessoasGruposNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredDesenvolvimentoItems = desenvolvimentoNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredOperacoesItems = operacoesNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredFinancasItems = financasNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredRelatoriosItems = relatoriosNavItems.filter(item => hasRequiredRole(item.roles));
+  const filteredAdminItems = adminNavItems.filter(item => hasRequiredRole(item.roles));
 
   return (
     <SidebarUI className={collapsed ? "w-14" : "w-64"}>
